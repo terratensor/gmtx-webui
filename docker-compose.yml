@@ -1,0 +1,115 @@
+services:
+  frontend:    
+    build:
+      context: frontend/docker
+      dockerfile: development/nginx/Dockerfile
+    ports:
+      - 20080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    environment:
+      APP_ENV: dev      
+      APP_DEBUG: 0
+      FRONTEND_NAME: App Frontend
+      DB_DSN_PREFIX: pgsql
+      DB_HOST: postgres    
+      DB_NAME: app
+      DB_USER: app
+      DB_PASSWORD_FILE: /run/secrets/app_db_password
+      COOKIE_DOMAIN: localhost
+      FRONTEND_URL: http://localhost:20080
+      BACKEND_URL: http://backend:21080
+      STATIC_URL: http://static.localhost
+      MAILER_FROM_EMAIL: mail@localhost
+      MAILER_FROM_NAME: application
+      MAILER_HOST: mailer
+      MAILER_PORT: 1025
+      MAILER_USERNAME: app
+      MAILER_PASSWORD_FILE: /run/secrets/app_mailer_password
+      MAILER_ENCRYPTION: tls
+    secrets:
+      - app_db_password
+      - app_mailer_password
+
+  backend:
+    build:
+      context: backend/docker
+      dockerfile: development/nginx/Dockerfile
+    ports:
+      - 21080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    environment:
+      APP_ENV: dev      
+      APP_DEBUG: 0
+      BACKEND_NAME: App Backend
+      DB_DSN_PREFIX: pgsql
+      DB_HOST: postgres    
+      DB_NAME: app
+      DB_USER: app
+      DB_PASSWORD_FILE: /run/secrets/app_db_password
+      COOKIE_DOMAIN: localhost
+      FRONTEND_URL: http://frontend:20080
+      BACKEND_URL: http://localhost:21080
+      STATIC_URL: http://static.localhost
+      MAILER_FROM_EMAIL: mail@localhost
+      MAILER_FROM_NAME: application
+      MAILER_HOST: mailer
+      MAILER_PORT: 1025
+      MAILER_USERNAME: app
+      MAILER_PASSWORD_FILE: /run/secrets/app_mailer_password
+      MAILER_ENCRYPTION: tls
+    secrets:
+      - app_db_password
+      - app_mailer_password
+
+  # mysql:
+  #   image: mysql:5.7
+  #   environment:      
+  #     MYSQL_ROOT_PASSWORD: verysecret
+  #     MYSQL_DATABASE: app
+  #     MYSQL_USER: app
+  #     MYSQL_PASSWORD: secret
+  #     # MYSQL_PASSWORD_FILE: /run/secrets/app_db_password
+  #   volumes:
+  #     - mysql:/var/lib/mysql
+  #   secrets:
+  #     - app_db_password
+  #   ports:
+  #     - "33065:3306"
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      APP_ENV: dev
+      POSTGRES_USER: app
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD_FILE: /run/secrets/app_db_password
+    secrets:
+      - app_db_password
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+
+  mailer:
+    image: mailhog/mailhog
+    ports:
+      - 1025:8025
+
+
+volumes:
+  postgres:
+  # mysql:
+
+secrets:
+  app_db_password:
+    file: ./secrets/development/app_db_password
+  app_mailer_password:
+    file: ./secrets/development/app_mailer_password
