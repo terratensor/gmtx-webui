@@ -21,8 +21,8 @@ services:
       context: frontend/docker
       dockerfile: development/nginx/Dockerfile
     restart: unless-stopped
-    ports:
-      - "20080:80"
+    expose:
+      - "80"
     volumes:
       - /var/www/.composer-docker/cache:/root/.composer/cache:delegated
       - ./frontend:/app
@@ -62,8 +62,8 @@ services:
       context: backend/docker
       dockerfile: development/nginx/Dockerfile
     restart: unless-stopped
-    ports:
-      - "21080:80"
+    expose:
+      - "80"
     volumes:
       - /var/www/.composer-docker/cache:/root/.composer/cache:delegated
       - ./backend:/app
@@ -101,8 +101,8 @@ services:
   static:
     image: nginx:alpine
     restart: unless-stopped
-    ports:
-      - "22080:80"
+    expose:
+      - "80"
     volumes:
       - /var/www/static:/usr/share/nginx/html:ro
     networks:
@@ -137,7 +137,6 @@ services:
 volumes:
   caddy_data:
   caddy_config:
-
 
 secrets:
   app_db_password:
