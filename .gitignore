@@ -42,3 +42,5 @@ phpunit.phar
 /backend/web/index-test.php
 /backend/web/robots.txt
 .env.prod
+secrets/production/app_db_password
+secrets/production/app_mailer_password

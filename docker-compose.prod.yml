@@ -1,4 +1,21 @@
 services:
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+      - static
+    networks:
+      - gmtx_net
+    restart: unless-stopped
+
   frontend:
     build:
       context: frontend/docker
@@ -126,4 +143,4 @@ secrets:
 networks:
   gmtx_net:
     name: gmtx_net
-    external: true
+    driver: bridge
