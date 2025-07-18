@@ -134,6 +134,11 @@ services:
       timeout: 10s
       retries: 3
 
+volumes:
+  caddy_data:
+  caddy_config:
+
+
 secrets:
   app_db_password:
     file: ./secrets/production/app_db_password
