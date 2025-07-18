@@ -20,10 +20,10 @@ services:
       DB_USER: app
       DB_PASSWORD_FILE: /run/secrets/app_db_password
       COOKIE_DOMAIN: localhost
-      FRONTEND_URL: https://gmtx.ru
-      BACKEND_URL: https://cp.gmtx.ru
-      STATIC_URL: https://static.gmtx.ru
-      MAILER_FROM_EMAIL: support@audetv.ru
+      FRONTEND_URL: http://localhost:20080
+      BACKEND_URL: http://backend:21080
+      STATIC_URL: http://static.localhost
+      MAILER_FROM_EMAIL: mail@localhost
       MAILER_FROM_NAME: application
       MAILER_HOST: mailer
       MAILER_PORT: 1025
@@ -33,8 +33,6 @@ services:
     secrets:
       - app_db_password
       - app_mailer_password
-    networks:
-      - gmtx_net
 
   backend:
     build:
@@ -57,9 +55,9 @@ services:
       DB_USER: app
       DB_PASSWORD_FILE: /run/secrets/app_db_password
       COOKIE_DOMAIN: localhost
-      FRONTEND_URL: https://gmtx.ru
-      BACKEND_URL: https://cp.gmtx.ru
-      STATIC_URL: https://static.gmtx.ru
+      FRONTEND_URL: http://frontend:20080
+      BACKEND_URL: http://localhost:21080
+      STATIC_URL: http://static.localhost
       MAILER_FROM_EMAIL: mail@localhost
       MAILER_FROM_NAME: application
       MAILER_HOST: mailer
@@ -70,17 +68,21 @@ services:
     secrets:
       - app_db_password
       - app_mailer_password
-    networks:
-      - gmtx_net
 
-  static:
-    image: nginx:alpine
-    ports:
-      - 22080:80
-    volumes:
-      - /mnt/work/gmtx/static:/usr/share/nginx/html:ro
-    networks:
-      - gmtx_net
+  # mysql:
+  #   image: mysql:5.7
+  #   environment:      
+  #     MYSQL_ROOT_PASSWORD: verysecret
+  #     MYSQL_DATABASE: app
+  #     MYSQL_USER: app
+  #     MYSQL_PASSWORD: secret
+  #     # MYSQL_PASSWORD_FILE: /run/secrets/app_db_password
+  #   volumes:
+  #     - mysql:/var/lib/mysql
+  #   secrets:
+  #     - app_db_password
+  #   ports:
+  #     - "33065:3306"
 
   postgres:
     image: postgres:17-alpine
@@ -92,30 +94,21 @@ services:
     secrets:
       - app_db_password
     volumes:
-      - /mnt/work/gmtx/postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     ports:
       - "54321:5432"
-    networks:
-      - gmtx_net
 
   mailer:
     image: mailhog/mailhog
     ports:
       - 1025:8025
-    networks:
-      - gmtx_net
+
+volumes:
+  postgres:
+    # mysql:
 
 secrets:
   app_db_password:
     file: ./secrets/development/app_db_password
   app_mailer_password:
     file: ./secrets/development/app_mailer_password
-
-networks:
-  gmtx_net:
-    name: gmtx_net
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-    external: true

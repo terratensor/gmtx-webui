@@ -3,6 +3,11 @@ init: docker-down \
 	docker-pull docker-build docker-up \
 	app-init
 
+prod: docker-prod-down \
+	docker-prod-up \
+	app-composer-install \
+	app-migrations
+
 up: docker-up
 down: docker-down
 restart: down up
@@ -38,8 +43,14 @@ app-migrations:
 docker-up:
 	docker compose up -d
 
+docker-prod-up:
+	docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+
 docker-down:
 	docker compose down --remove-orphans
+
+docker-prod-down:
+	docker compose -f docker-compose.prod.yml down --remove-orphans
 
 docker-down-clear:
 	docker compose down -v --remove-orphans
