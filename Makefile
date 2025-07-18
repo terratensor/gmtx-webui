@@ -13,7 +13,7 @@ prod:
 
 prod-init: docker-prod-down \
 	app-clear \
-	docker-prod-up \
+	docker-prod-pull docker-prod-build docker-prod-up \
 	app-init
 
 up: docker-up
@@ -66,5 +66,11 @@ docker-down-clear:
 docker-pull:
 	docker compose pull
 
+docker-prod-pull:
+	docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+
 docker-build:
 	DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose build --build-arg BUILDKIT_INLINE_CACHE=1 --pull
+
+docker-prod-build:
+	DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose --env-file .env.prod -f docker-compose.prod.yml build --build-arg BUILDKIT_INLINE_CACHE=1
