@@ -27,7 +27,7 @@ services:
       - /var/www/.composer-docker/cache:/root/.composer/cache:delegated
       - ./frontend:/app
     environment:
-      APP_ENV: prod
+      APP_ENV: dev
       APP_DEBUG: 0
       FRONTEND_NAME: App Frontend
       DB_DSN_PREFIX: pgsql
@@ -63,7 +63,7 @@ services:
       - /var/www/.composer-docker/cache:/root/.composer/cache:delegated
       - ./backend:/app
     environment:
-      APP_ENV: prod
+      APP_ENV: dev
       APP_DEBUG: 0
       BACKEND_NAME: App Backend
       DB_DSN_PREFIX: pgsql
