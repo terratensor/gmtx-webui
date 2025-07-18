@@ -8,6 +8,11 @@ prod: docker-prod-down \
 	app-composer-install \
 	app-migrations
 
+prod-init: docker-prod-down \
+	app-clear \
+	docker-prod-up \
+	app-init
+
 up: docker-up
 down: docker-down
 restart: down up
