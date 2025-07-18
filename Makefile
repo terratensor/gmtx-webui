@@ -50,7 +50,7 @@ docker-down:
 	docker compose down --remove-orphans
 
 docker-prod-down:
-	docker compose -f docker-compose.prod.yml down --remove-orphans
+	docker compose --env-file .env.prod -f docker-compose.prod.yml down --remove-orphans
 
 docker-down-clear:
 	docker compose down -v --remove-orphans
