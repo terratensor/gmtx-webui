@@ -1,4 +1,4 @@
-FROM yiisoftware/yii2-php:8.3-fpm-nginx
+FROM yiisoftware/yii2-php:8.4-fpm-nginx
 
 COPY ./development/nginx/conf.d /etc/nginx/conf.d
 
