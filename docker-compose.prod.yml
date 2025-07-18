@@ -51,11 +51,6 @@ services:
       - app_mailer_password
     networks:
       - gmtx_net
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   backend:
     build:
@@ -92,11 +87,6 @@ services:
       - app_mailer_password
     networks:
       - gmtx_net
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   static:
     image: nginx:alpine
@@ -107,11 +97,6 @@ services:
       - /var/www/static:/usr/share/nginx/html:ro
     networks:
       - gmtx_net
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   postgres:
     image: postgres:17-alpine
@@ -128,15 +113,11 @@ services:
       - "54321:5432"
     networks:
       - gmtx_net
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   caddy_data:
   caddy_config:
+
 
 secrets:
   app_db_password:
