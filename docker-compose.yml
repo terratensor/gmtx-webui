@@ -19,7 +19,7 @@ services:
       DB_NAME: app
       DB_USER: app
       DB_PASSWORD_FILE: /run/secrets/app_db_password
-      COOKIE_DOMAIN: localhost
+      COOKIE_DOMAIN: ""
       FRONTEND_URL: https://gmtx.ru
       BACKEND_URL: https://cp.gmtx.ru
       STATIC_URL: https://static.gmtx.ru
@@ -59,7 +59,7 @@ services:
       DB_NAME: app
       DB_USER: app
       DB_PASSWORD_FILE: /run/secrets/app_db_password
-      COOKIE_DOMAIN: localhost
+      COOKIE_DOMAIN: ""
       FRONTEND_URL: https://gmtx.ru
       BACKEND_URL: https://cp.gmtx.ru
       STATIC_URL: https://static.gmtx.ru

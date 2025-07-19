@@ -26,7 +26,8 @@
         "webmozart/assert": "^1.11",
         "ramsey/uuid": "^4.7",
         "twig/twig": "^3.16",
-        "manticoresoftware/manticoresearch-php": "dev-master"
+        "manticoresoftware/manticoresearch-php": "dev-master",
+        "npm-asset/bootstrap-icons": "^1.13"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

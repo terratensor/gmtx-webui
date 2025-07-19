@@ -2,7 +2,10 @@
 
 namespace frontend\assets;
 
+use yii\web\YiiAsset;
 use yii\web\AssetBundle;
+use yii\bootstrap5\BootstrapAsset;
+use yii\bootstrap5\BootstrapPluginAsset;
 
 /**
  * Main frontend application asset bundle.
@@ -14,10 +17,11 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
     ];
-    public $js = [
-    ];
+    public $js = [];
     public $depends = [
-        'yii\web\YiiAsset',
-        'yii\bootstrap5\BootstrapAsset',
+        YiiAsset::class,
+        BootstrapAsset::class,
+        BootstrapPluginAsset::class,
+        BsIconsAsset::class,
     ];
 }
