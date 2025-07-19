@@ -44,3 +44,4 @@ phpunit.phar
 .env.prod
 secrets/production/app_db_password
 secrets/production/app_mailer_password
+.env

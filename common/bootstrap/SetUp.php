@@ -5,33 +5,34 @@ declare(strict_types=1);
 namespace common\bootstrap;
 
 
-use App\Auth\Service\Tokenizer;
+use Yii;
+use DateInterval;
+use yii\di\Container;
+use Manticoresearch\Client;
 use App\FeatureToggle\Feature;
+use yii\rbac\ManagerInterface;
+use App\Auth\Service\Tokenizer;
+use yii\base\BootstrapInterface;
 use App\FeatureToggle\FeatureFlag;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mailer\Mailer;
 use App\Frontend\FrontendUrlGenerator;
-use App\Indexer\Service\IndexerService;
-use App\Indexer\Service\IndexFromDB\Handler;
-use App\Indexer\Service\QuestionIndexService;
 use App\dispatchers\AppEventDispatcher;
-use App\dispatchers\SimpleAppEventDispatcher;
-use App\Question\Entity\listeners\CommentCreatedListener;
-use App\Question\Entity\Question\events\CommentCreated;
-use App\repositories\Question\QuestionRepository;
+use App\Indexer\Service\IndexerService;
 use App\services\Manticore\IndexService;
+use App\Indexer\Service\IndexFromDB\Handler;
+use App\dispatchers\SimpleAppEventDispatcher;
+use App\Indexer\Service\QuestionIndexService;
+use Symfony\Component\Mailer\MailerInterface;
+use App\repositories\Question\QuestionRepository;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use App\Question\Entity\Question\events\CommentCreated;
+use App\Question\Entity\listeners\CommentCreatedListener;
 use App\Svodd\Entity\Chart\events\StartCommentDataIDSetter;
 use App\Svodd\Entity\listeners\CommentDataIDSetterListener;
-use DateInterval;
-use Manticoresearch\Client;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Mailer\EventListener\EnvelopeListener;
-use Yii;
-use yii\di\Container;
-use yii\base\BootstrapInterface;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mailer\MailerInterface;
+use src\Library\manticore\repositories\ParagraphRepository;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Component\Mime\Address;
-use yii\rbac\ManagerInterface;
+use Symfony\Component\Mailer\EventListener\EnvelopeListener;
 
 /**
  * Class SetUp
@@ -83,6 +84,11 @@ class SetUp implements BootstrapInterface
 
         $container->setSingleton(Tokenizer::class, [], [
             new DateInterval($app->params['auth']['token_ttl'])
+        ]);
+
+        $container->setSingleton(ParagraphRepository::class, [], [
+            new Client($app->params['manticore']),
+            $app->params['searchResults']['pageSize'],
         ]);
 
         require __DIR__ . '/twig.php';

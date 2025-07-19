@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\services;
 
-use src\forms\SearchForm;
-use src\repositories\ParagraphDataProvider;
-use src\repositories\ParagraphRepository;
 use Yii;
+use src\Search\forms\SearchForm;
+use src\Library\manticore\repositories\ParagraphRepository;
+use src\Library\manticore\repositories\ParagraphDataProvider;
 
 class ManticoreService
 {

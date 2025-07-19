@@ -2,25 +2,43 @@
 
 namespace frontend\controllers;
 
-use frontend\models\ResendVerificationEmailForm;
-use frontend\models\VerifyEmailForm;
 use Yii;
-use yii\base\InvalidArgumentException;
-use yii\web\BadRequestHttpException;
+use Exception;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
+use yii\filters\AccessControl;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use src\Search\forms\SearchForm;
+use frontend\models\VerifyEmailForm;
+use yii\web\BadRequestHttpException;
+use frontend\models\ResetPasswordForm;
+use yii\base\InvalidArgumentException;
+use frontend\models\PasswordResetRequestForm;
+use frontend\models\ResendVerificationEmailForm;
+use src\Library\manticore\services\ManticoreService;
+use src\Search\Http\Action\V1\SearchSettings\ToggleAction;
+use src\Library\manticore\services\EmptySearchRequestExceptions;
 
 /**
  * Site controller
  */
 class SiteController extends Controller
 {
+
+    private ManticoreService $service;
+
+    public function __construct(
+        $id,
+        $module,
+        ManticoreService $service,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,6 +51,9 @@ class SiteController extends Controller
             'captcha' => [
                 'class' => \yii\captcha\CaptchaAction::class,
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+            ],
+            'search-settings' => [
+                'class' => ToggleAction::class,
             ],
         ];
     }
@@ -78,5 +99,34 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    public function actionSearch(): string
+    {
+        $results = null;
+        $form = new SearchForm();
+        $errorQueryMessage = '';
+
+        try {
+            if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
+
+                $results = $this->service->search($form);
+
+                var_dump($results);
+            }
+        } catch (\DomainException $e) {
+            Yii::$app->errorHandler->logException($e);
+            Yii::$app->session->setFlash('error', $e->getMessage());
+        } catch (EmptySearchRequestExceptions $e) {
+            $errorQueryMessage = "1" . $e->getMessage();
+        } catch (Exception $e) {
+            $errorQueryMessage = "2" . $e->getMessage();
+        }
+
+        return $this->render('search', [
+            'results' => $results ?? null,
+            'model' => $form,
+            'errorQueryMessage' => $errorQueryMessage,
+        ]);
     }
 }

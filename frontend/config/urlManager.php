@@ -17,6 +17,7 @@ return [
         'about' => 'site/about',
         'signup' => 'auth/join/request',
         'join/confirm' => 'auth/join/confirm',
+        'search' => 'site/search',
         '<_a:login|logout>' => 'auth/auth/<_a>',
 
         '<_c:[\w\-]+>' => '<_c>/index',
