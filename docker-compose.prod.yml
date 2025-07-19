@@ -25,7 +25,7 @@ services:
       - "80"
     volumes:
       - /var/www/.composer-docker/cache:/root/.composer/cache:delegated
-      - ./frontend:/app
+      - ./:/app
     environment:
       APP_ENV: dev
       APP_DEBUG: 0
@@ -61,7 +61,7 @@ services:
       - "80"
     volumes:
       - /var/www/.composer-docker/cache:/root/.composer/cache:delegated
-      - ./backend:/app
+      - ./:/app
     environment:
       APP_ENV: dev
       APP_DEBUG: 0
