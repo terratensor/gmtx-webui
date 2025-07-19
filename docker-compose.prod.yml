@@ -39,7 +39,7 @@ services:
       FRONTEND_URL: https://${DOMAIN}
       BACKEND_URL: https://cp.${DOMAIN}
       STATIC_URL: https://static.${DOMAIN}
-      MAILER_FROM_EMAIL: no-reply@${DOMAIN}
+      MAILER_FROM_EMAIL: ${MAILER_FROM_EMAIL}
       MAILER_FROM_NAME: ${APP_NAME}
       MAILER_HOST: ${MAILER_HOST}
       MAILER_PORT: ${MAILER_PORT}
@@ -75,7 +75,7 @@ services:
       FRONTEND_URL: https://${DOMAIN}
       BACKEND_URL: https://cp.${DOMAIN}
       STATIC_URL: https://static.${DOMAIN}
-      MAILER_FROM_EMAIL: no-reply@${DOMAIN}
+      MAILER_FROM_EMAIL: ${MAILER_FROM_EMAIL}
       MAILER_FROM_NAME: ${APP_NAME}
       MAILER_HOST: ${MAILER_HOST}
       MAILER_PORT: ${MAILER_PORT}
