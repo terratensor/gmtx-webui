@@ -34,6 +34,7 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
     <header>
         <?php
         NavBar::begin([
+            'brandImage' => '/img/logo.png',
             'brandLabel' => Yii::$app->name,
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
