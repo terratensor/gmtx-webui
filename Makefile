@@ -6,10 +6,10 @@ init: docker-down \
 prod:
 	docker compose --env-file .env.prod -f docker-compose.prod.yml down --remove-orphans
 	docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --remove-orphans
-	docker compose exec frontend git config --global --add safe.directory /app
-	docker compose run --rm frontend composer install
-	docker compose run --rm frontend php yii migrate --interactive=0
-	docker compose run --rm frontend php yii migrate-rbac --interactive=0
+	docker compose --env-file .env.prod -f docker-compose.prod.yml exec frontend git config --global --add safe.directory /app
+	docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm frontend composer install
+	docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm frontend php yii migrate --interactive=0
+	docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm frontend php yii migrate-rbac --interactive=0
 
 prod-init: docker-prod-down \
 	app-clear \
