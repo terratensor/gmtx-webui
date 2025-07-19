@@ -50,7 +50,7 @@ app-composer-update:
 
 app-migrations:
 	$(DC) run --rm frontend php yii migrate --interactive=0
-	$(DC) run --rm frontend php yii migrate-rbac --interactive=0
+# 	$(DC) run --rm frontend php yii migrate-rbac --interactive=0
 
 docker-up:
 	$(DC) up -d
