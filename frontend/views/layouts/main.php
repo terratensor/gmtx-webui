@@ -68,7 +68,7 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
         ?>
     </header>
 
-    <main role="main" class="flex-shrink-0">
+    <main role="main" class="flex-shrink-0 mb-3">
         <?= $this->render('_sidebar') ?>
         <div class="container">
             <?= Breadcrumbs::widget([
