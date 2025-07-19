@@ -1,19 +1,28 @@
+# Environment variables
+ENV_FILE ?= .env
+COMPOSE_FILE ?= docker-compose.yml
+
+# Docker compose commands
+DC = docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE)
+
+# Targets
 init: docker-down \
 	app-clear \
 	docker-pull docker-build docker-up \
 	app-init
 
-prod:
-	docker compose --env-file .env.prod -f docker-compose.prod.yml down --remove-orphans
-	docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --remove-orphans
-	docker compose --env-file .env.prod -f docker-compose.prod.yml exec frontend git config --global --add safe.directory /app
-	docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm frontend composer install
-	docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm frontend php yii migrate --interactive=0
-	docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm frontend php yii migrate-rbac --interactive=0
-
-prod-init: docker-prod-down \
+prod: ENV_FILE = .env.prod
+prod: COMPOSE_FILE = docker-compose.prod.yml
+prod: docker-down \
 	app-clear \
-	docker-prod-pull docker-prod-build docker-prod-up \
+	docker-pull docker-build docker-up \
+	app-init
+
+prod-init: ENV_FILE = .env.prod
+prod-init: COMPOSE_FILE = docker-compose.prod.yml
+prod-init: docker-down \
+	app-clear \
+	docker-pull docker-build docker-up \
 	app-init
 
 up: docker-up
@@ -25,52 +34,35 @@ app-clear:
 	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'rm -rf frontend/runtime/* backend/runtime/cache/*'
 
 app-init: app-permissions app-composer-install app-yii-init \
-	app-migrations \
-	#app-console-run \
-#	app-index-create app-index-indexer	
+	app-migrations
 
 app-permissions:
 	docker run --rm -v ${PWD}:/app -w /app alpine chmod 777 var/cache var/log var/test
 
-app-yii-init: # инициализация yii framework
-	docker compose run --rm frontend php init-actions --interactive=0
+app-yii-init:
+	$(DC) run --rm frontend php init-actions --interactive=0
 
 app-composer-install:
-	docker compose run --rm frontend composer install
+	$(DC) run --rm frontend composer install
 
 app-composer-update:
-	docker compose run --rm frontend composer update
-
-# app-console-run:
-# 	docker compose run --rm frontend php yii rules/bootstrap
+	$(DC) run --rm frontend composer update
 
 app-migrations:
-	docker compose run --rm frontend php yii migrate --interactive=0
-	docker compose run --rm frontend php yii migrate-rbac --interactive=0
+	$(DC) run --rm frontend php yii migrate --interactive=0
+	$(DC) run --rm frontend php yii migrate-rbac --interactive=0
 
 docker-up:
-	docker compose up -d
-
-docker-prod-up:
-	docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+	$(DC) up -d
 
 docker-down:
-	docker compose down --remove-orphans
-
-docker-prod-down:
-	docker compose --env-file .env.prod -f docker-compose.prod.yml down --remove-orphans
+	$(DC) down --remove-orphans
 
 docker-down-clear:
-	docker compose down -v --remove-orphans
+	$(DC) down -v --remove-orphans
 
 docker-pull:
-	docker compose pull
-
-docker-prod-pull:
-	docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+	$(DC) pull
 
 docker-build:
-	DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose build --build-arg BUILDKIT_INLINE_CACHE=1 --pull
-
-docker-prod-build:
-	DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose --env-file .env.prod -f docker-compose.prod.yml build --build-arg BUILDKIT_INLINE_CACHE=1
+	DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 $(DC) build --build-arg BUILDKIT_INLINE_CACHE=1 --pull
