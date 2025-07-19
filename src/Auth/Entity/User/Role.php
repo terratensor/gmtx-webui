@@ -10,6 +10,7 @@ class Role
 {
     public const USER = 'user';
     public const ADMIN = 'admin';
+    public const MEMBER = 'member';
 
     private string $name;
 
@@ -17,6 +18,7 @@ class Role
     {
         Assert::oneOf($name, [
             self::USER,
+            self::MEMBER,
             self::ADMIN
         ]);
 
@@ -26,6 +28,11 @@ class Role
     public static function user(): self
     {
         return new self(self::USER);
+    }
+
+    public static function member(): self
+    {
+        return new self(self::MEMBER);
     }
 
     public static function admin(): self
