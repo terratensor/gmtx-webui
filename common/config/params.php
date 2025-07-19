@@ -39,4 +39,15 @@ return [
             FrontendUrlTwigExtension::class
         ],
     ],
+
+    'manticore' => [
+        'host' => getenv('MANTICORE_HOST'),
+        'port' => (int)getenv('MANTICORE_PORT'),
+        'API-Key' => getenv('MANTICORE_API_KEY'),
+        'max_matches' => getenv('MANTICORE_MAX_MATCHES') ?: 0, // Maximum amount of matches that the server keeps in RAM for each table and can return to the client. Default is unlimited.
+    ],
+
+    'searchResults' => [
+        'pageSize' => (int)getenv('PAGE_SIZE') ?: 50,
+    ],
 ];

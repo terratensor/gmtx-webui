@@ -46,6 +46,9 @@ services:
       MAILER_USERNAME: ${MAILER_USERNAME}
       MAILER_PASSWORD_FILE: /run/secrets/app_mailer_password
       MAILER_ENCRYPTION: tls
+      MANTICORE_HOST: ${MANTICORE_HOST}
+      MANTICORE_PORT: ${MANTICORE_PORT}
+      MANTICORE_API_KEY: ${MANTICORE_API_KEY}
     secrets:
       - app_db_password
       - app_mailer_password
@@ -82,6 +85,9 @@ services:
       MAILER_USERNAME: ${MAILER_USERNAME}
       MAILER_PASSWORD_FILE: /run/secrets/app_mailer_password
       MAILER_ENCRYPTION: tls
+      MANTICORE_HOST: ${MANTICORE_HOST}
+      MANTICORE_PORT: ${MANTICORE_PORT}
+      MANTICORE_API_KEY: ${MANTICORE_API_KEY}
     secrets:
       - app_db_password
       - app_mailer_password
