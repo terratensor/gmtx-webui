@@ -42,6 +42,32 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['search'], // Указываем, к каким действиям применяем контроль
+                'rules' => [
+                    [
+                        'actions' => ['search'],
+                        'allow' => true,
+                        'roles' => ['member'], // Только пользователи с ролью member
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function actions()
     {
         return [
@@ -111,16 +137,14 @@ class SiteController extends Controller
             if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
 
                 $results = $this->service->search($form);
-
-                var_dump($results);
             }
         } catch (\DomainException $e) {
             Yii::$app->errorHandler->logException($e);
             Yii::$app->session->setFlash('error', $e->getMessage());
         } catch (EmptySearchRequestExceptions $e) {
-            $errorQueryMessage = "1" . $e->getMessage();
+            $errorQueryMessage = $e->getMessage();
         } catch (Exception $e) {
-            $errorQueryMessage = "2" . $e->getMessage();
+            $errorQueryMessage = $e->getMessage();
         }
 
         return $this->render('search', [

@@ -43,10 +43,10 @@ return [
     'manticore' => [
         'host' => getenv('MANTICORE_HOST'),
         'port' => (int)getenv('MANTICORE_PORT'),
-        'headers' => [
-            'X-API-Key' => getenv('MANTICORE_API_KEY'),
+        'curl' => [
+            CURLOPT_HTTPHEADER => ["X-API-Key: " . getenv('MANTICORE_API_KEY')]
         ],
-        // 'max_matches' => getenv('MANTICORE_MAX_MATCHES') ?: 0, // Maximum amount of matches that the server keeps in RAM for each table and can return to the client. Default is unlimited.
+        'max_matches' => getenv('MANTICORE_MAX_MATCHES') ?: 0, // Maximum amount of matches that the server keeps in RAM for each table and can return to the client. Default is unlimited.
     ],
 
     'searchResults' => [
@@ -54,7 +54,7 @@ return [
     ],
 
     'indexes' => [
-        'common' => getenv('MANTICORE_DB_NAME_COMMON') ?: 'library',
+        'common' => getenv('MANTICORE_DB_NAME_COMMON') ?: 'library2025',
         'concept' => getenv('MANTICORE_DB_NAME_COMMON') . '_concept' ?: 'library_concept',
     ],
 ];
