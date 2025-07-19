@@ -25,7 +25,8 @@
         "yiisoft/yii2-symfonymailer": "~2.0.3",
         "webmozart/assert": "^1.11",
         "ramsey/uuid": "^4.7",
-        "twig/twig": "^3.16"
+        "twig/twig": "^3.16",
+        "manticoresoftware/manticoresearch-php": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -67,7 +68,8 @@
     },
     "config": {
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "php-http/discovery": true
         },
         "process-timeout": 1800,
         "fxp-asset": {
