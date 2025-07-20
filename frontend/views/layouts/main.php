@@ -34,9 +34,22 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
     <?= $this->render('_navbar'); ?>
     <main role="main" class="flex-shrink-0 mb-3">
         <?php $this->render('_sidebar') ?>
-        <div class="container" style="margin: 40px;">
-            <?= Alert::widget() ?>
-        </div>
+
+        <?php $session = Yii::$app->session;
+        $showAlert = false;
+        $flashes = $session->getAllFlashes();
+        foreach ($flashes as $type => $flash) {
+            if (isset($this->alertTypes[$type])) {
+                $showAlert = true;
+                break;
+            }
+        }; ?>
+        <?php if ($showAlert): ?>
+            <div class="container" style="margin: 40px;">
+                <?= Alert::widget() ?>
+            </div>
+        <?php endif; ?>
+
         <?= $content ?>
 
     </main>
