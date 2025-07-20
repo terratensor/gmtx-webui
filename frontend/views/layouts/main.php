@@ -30,14 +30,14 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
 
 <body class="d-flex flex-column h-100">
     <?php $this->beginBody() ?>
-    
+
     <?= $this->render('_navbar'); ?>
     <main role="main" class="flex-shrink-0 mb-3">
-        <?= $this->render('_sidebar') ?>
-        <div class="container">
-            <?= Alert::widget() ?>
-            <?= $content ?>
-        </div>
+        <?php $this->render('_sidebar') ?>
+        <?= Alert::widget() ?>
+
+        <?= $content ?>
+
     </main>
 
     <?php $this->endBody() ?>

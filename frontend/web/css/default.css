@@ -277,6 +277,10 @@
     border-color: #b90000;
 }
 
+.search-results {
+    margin-top: 55px;
+}
+
 .search-results mark {
     color: var(--sr-mark-color);
     background-color: var(--sr-bg-color);

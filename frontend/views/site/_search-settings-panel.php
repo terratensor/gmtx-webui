@@ -1,0 +1,168 @@
+<?php
+
+
+use yii\bootstrap5\Html;
+use src\Search\forms\SearchForm;
+use src\Search\helpers\UrlHelper;
+
+/** @var yii\web\View $this */
+/** @var yii\bootstrap5\ActiveForm $form */
+/** @var SearchForm $model */
+
+$aggs = $this->params['aggs'] ?? [];
+?>
+<?php if (empty($aggs)) return; ?>
+
+<div id="search-setting-panel"
+    class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
+    <div class="sidebar">
+        <div class="sidebar-header d-flex justify-content-between">
+            <div>
+                <small>Найдено записей: <b><?= number_format($aggs['hits']['total'] ?? 0, 0, '', ' ') ?></b></small>
+            </div>
+            <button type="button" id="close-search-settings" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- Чекбокс для включения/выключения нечёткого поиска -->
+            <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
+                ->checkbox()
+                ->label('Нечёткий поиск'); ?>
+            <!-- Чекбокс для включения/выключения однострочного режима -->
+            <?= $form->field($model, 'singleLineMode', [
+                'options' => ['class' => 'pb-2 single-line-mode'],
+                'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
+                'labelOptions' => ['class' => 'form-check-label'],
+            ])->checkbox([
+                'class' => 'form-check-input',
+                'id' => 'single-line-mode',
+                'uncheck' => null,
+                'data-scroll' => 'true', // Добавляем атрибут для обработки скролла
+            ], false)->label('Однострочный режим (убрать переносы строк)');
+            ?>
+            <div class="accordion" id="filtersAccordion">
+                <!-- Жанры -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#genreCollapse">
+                            <i class="bi bi-bookmark me-2"></i> Жанры
+                        </button>
+                    </h2>
+                    <div id="genreCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                        <div class="accordion-body p-0">
+                            <div class="facet-search mb-2 px-2">
+                                <input type="text" class="form-control form-control-sm" placeholder="Поиск жанров...">
+                            </div>
+                            <ul class="facet-list">
+                                <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
+                                    <?php if (!empty($genre['key'])): ?>
+                                        <li>
+                                            <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>">
+                                                <?= Html::encode($genre['key']) ?>
+                                                <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Авторы -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
+                            <i class="bi bi-person me-2"></i> Авторы
+                        </button>
+                    </h2>
+                    <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                        <div class="accordion-body p-0">
+                            <div class="facet-search mb-2 px-2">
+                                <input type="text" class="form-control form-control-sm" placeholder="Поиск авторов...">
+                            </div>
+                            <ul class="facet-list">
+                                <?php foreach ($aggs['aggregations']['author_group']['buckets'] as $author): ?>
+                                    <?php if (!empty($author['key'])): ?>
+                                        <li>
+                                            <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
+                                                <?= Html::encode($author['key']) ?>
+                                                <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Названия -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#titleCollapse">
+                            <i class="bi bi-card-text me-2"></i> Названия
+                        </button>
+                    </h2>
+                    <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                        <div class="accordion-body p-0">
+                            <div class="facet-search mb-2 px-2">
+                                <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
+                            </div>
+                            <ul class="facet-list">
+                                <?php foreach ($aggs['aggregations']['title_group']['buckets'] as $title): ?>
+                                    <?php if (!empty($title['key'])): ?>
+                                        <li>
+                                            <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
+                                                <?= Html::encode(mb_substr($title['key'], 0, 30) . (mb_strlen($title['key']) > 30 ? '...' : '')) ?>
+                                                <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Проверяем состояние при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+        // Восстанавливаем открытый аккордеон
+        const lastOpenAccordion = localStorage.getItem('lastOpenAccordion');
+        if (lastOpenAccordion) {
+            const collapseElement = document.querySelector(lastOpenAccordion);
+            if (collapseElement) {
+                new bootstrap.Collapse(collapseElement, {
+                    toggle: true
+                });
+            }
+        }
+
+        // Обработчики для аккордеона
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.getAttribute('data-bs-target');
+                localStorage.setItem('lastOpenAccordion', target);
+            });
+        });
+
+        // Поиск внутри фасетов
+        document.querySelectorAll('.facet-search input').forEach(input => {
+            input.addEventListener('keyup', function() {
+                const searchText = this.value.toLowerCase();
+                const list = this.closest('.accordion-body').querySelector('.facet-list');
+
+                Array.from(list.querySelectorAll('li')).forEach(li => {
+                    const text = li.textContent.toLowerCase();
+                    li.style.display = text.includes(searchText) ? '' : 'none';
+                });
+            });
+        });
+    });
+</script>

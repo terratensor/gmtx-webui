@@ -2,7 +2,12 @@
 
 use yii\bootstrap5\Html;
 use yii\bootstrap5\ActiveForm;
+use src\Search\forms\SearchForm;
 use src\Search\helpers\SearchHelper;
+
+/** @var yii\web\View $this */
+/** @var yii\bootstrap5\ActiveForm $form */
+/** @var SearchForm $model */
 
 /** Search settings form block */
 echo Html::beginForm(['/site/search-settings'], 'post', ['name' => 'searchSettingsForm', 'class' => 'd-flex']);
@@ -85,27 +90,10 @@ $inputTemplate = '<div class="input-group mb-2">
                 </div>
             </div>
         <?php endif; ?>
-        <div id="search-setting-panel"
-            class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
 
-            <!-- Чекбокс для включения/выключения нечёткого поиска -->
-            <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
-                ->checkbox()
-                ->label('Нечёткий поиск'); ?>
-            <!-- Чекбокс для включения/выключения однострочного режима -->
-            <?= $form->field($model, 'singleLineMode', [
-                'options' => ['class' => 'pb-2 single-line-mode'],
-                'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
-                'labelOptions' => ['class' => 'form-check-label'],
-            ])->checkbox([
-                'class' => 'form-check-input',
-                'id' => 'single-line-mode',
-                'uncheck' => null,
-                'data-scroll' => 'true', // Добавляем атрибут для обработки скролла
-            ], false)->label('Однострочный режим (убрать переносы строк)');
-            ?>
-        </div>
+        <?= $this->render('_search-settings-panel', ['model' => $model, 'form' => $form]); ?>
 
         <?php ActiveForm::end(); ?>
+
     </div>
 </div>

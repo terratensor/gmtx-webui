@@ -225,8 +225,12 @@ function onScroll() {
   }
 }
 
+// Показать/скрыть настройки
 const btn = document.getElementById('button-search-settings');
 btn.addEventListener('click', toggleSearchSettings, false)
+
+//Кнопка закрыть в настройках
+document.getElementById('close-search-settings').addEventListener('click', toggleSearchSettings, false)
 
 function toggleSearchSettings(event) {
   event.preventDefault();
