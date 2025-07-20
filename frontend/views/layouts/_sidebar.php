@@ -1,12 +1,13 @@
 <?php
 
-use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\Html;
+use src\Search\helpers\UrlHelper;
 
 $aggs = $this->params['aggs'] ?? [];
 ?>
 <?php if (empty($aggs)) return; ?>
-<div class="sidebar-wrapper">
+<div class="sidebar-wrapper" style="position: fixed; top: 60px; left: 0; height: 100vh;">
     <div class="sidebar-toggle" onclick="toggleSidebar()">
         <i class="bi bi-chevron-double-left"></i>
     </div>
@@ -39,7 +40,7 @@ $aggs = $this->params['aggs'] ?? [];
                                 <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
                                     <?php if (!empty($genre['key'])): ?>
                                         <li>
-                                            <a href="<?= Url::to(['site/search', 'search' => ['genre' => $genre['key']]]) ?>">
+                                            <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>">
                                                 <?= Html::encode($genre['key']) ?>
                                                 <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
                                             </a>
@@ -67,7 +68,7 @@ $aggs = $this->params['aggs'] ?? [];
                                 <?php foreach ($aggs['aggregations']['author_group']['buckets'] as $author): ?>
                                     <?php if (!empty($author['key'])): ?>
                                         <li>
-                                            <a href="<?= Url::to(['site/search', 'search' => ['author' => $author['key']]]) ?>">
+                                            <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
                                                 <?= Html::encode($author['key']) ?>
                                                 <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
                                             </a>
@@ -95,7 +96,7 @@ $aggs = $this->params['aggs'] ?? [];
                                 <?php foreach ($aggs['aggregations']['title_group']['buckets'] as $title): ?>
                                     <?php if (!empty($title['key'])): ?>
                                         <li>
-                                            <a href="<?= Url::to(['site/search', 'search' => ['title' => $title['key']]]) ?>">
+                                            <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
                                                 <?= Html::encode(mb_substr($title['key'], 0, 30) . (mb_strlen($title['key']) > 30 ? '...' : '')) ?>
                                                 <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
                                             </a>
@@ -123,10 +124,30 @@ $aggs = $this->params['aggs'] ?? [];
 
     // Проверяем состояние при загрузке
     document.addEventListener('DOMContentLoaded', function() {
+        // Восстанавливаем состояние сайдбара
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         if (isCollapsed) {
             document.querySelector('.sidebar-wrapper').classList.add('collapsed');
         }
+
+        // Восстанавливаем открытый аккордеон
+        const lastOpenAccordion = localStorage.getItem('lastOpenAccordion');
+        if (lastOpenAccordion) {
+            const collapseElement = document.querySelector(lastOpenAccordion);
+            if (collapseElement) {
+                new bootstrap.Collapse(collapseElement, {
+                    toggle: true
+                });
+            }
+        }
+
+        // Обработчики для аккордеона
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.getAttribute('data-bs-target');
+                localStorage.setItem('lastOpenAccordion', target);
+            });
+        });
 
         // Поиск внутри фасетов
         document.querySelectorAll('.facet-search input').forEach(input => {

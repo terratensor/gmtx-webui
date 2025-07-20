@@ -29,6 +29,10 @@ return [
                 'httpOnly' => true,
             ],
         ],
+        'assetManager' => [
+            'appendTimestamp' => true,
+            'linkAssets' => false,
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

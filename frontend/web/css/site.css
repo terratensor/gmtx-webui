@@ -23,7 +23,7 @@
 
 main>.container,
 main>.container-fluid {
-    padding: 70px 15px 20px;
+    padding: 60px 15px 20px;
 }
 
 .footer>.container,
@@ -190,6 +190,7 @@ div#toLast {
 
 p.summary {
     font-weight: bold;
+    margin-bottom: 0;
 }
 
 .site-index .fixed-bottom {
@@ -208,15 +209,9 @@ p.summary {
     margin: 1rem 0;
 }
 
-/* .search-block {
-    position: sticky;
-    top: 55px;
-    z-index: 999;
-} */
-
 .search-block {
     position: sticky;
-    top: 0;
+    top: 60px;
     background: white;
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
