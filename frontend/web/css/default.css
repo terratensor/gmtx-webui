@@ -254,6 +254,34 @@
 }
 
 /* СТИЛИ */
+/* Стилизация скроллбара в зависимости от значения data-bs-theme */
+/* Стили для темной темы */
+html[data-bs-theme="dark"]::-webkit-scrollbar-track {
+    background-color: #1a1a1a;
+}
+
+html[data-bs-theme="dark"]::-webkit-scrollbar-thumb {
+    background-color: #555;
+}
+
+html[data-bs-theme="dark"] {
+    scrollbar-color: #555 #1a1a1a;
+    /* Firefox */
+}
+
+/* Стили для светлой темы */
+html[data-bs-theme="light"]::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+html[data-bs-theme="light"]::-webkit-scrollbar-thumb {
+    background-color: #888;
+}
+
+html[data-bs-theme="light"] {
+    scrollbar-color: #888 #f1f1f1;
+    /* Firefox */
+}
 
 .btn-primary {
     --bs-btn-color: #fff;

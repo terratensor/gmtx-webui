@@ -11,8 +11,6 @@ use src\Search\helpers\UrlHelper;
 
 $aggs = $this->params['aggs'] ?? [];
 ?>
-<?php if (empty($aggs)) return; ?>
-
 <div id="search-setting-panel"
     class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
     <div class="sidebar">
@@ -40,91 +38,94 @@ $aggs = $this->params['aggs'] ?? [];
                 'data-scroll' => 'true', // Добавляем атрибут для обработки скролла
             ], false)->label('Однострочный режим (убрать переносы строк)');
             ?>
-            <div class="accordion" id="filtersAccordion">
-                <!-- Жанры -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#genreCollapse">
-                            <i class="bi bi-bookmark me-2"></i> Жанры
-                        </button>
-                    </h2>
-                    <div id="genreCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
-                        <div class="accordion-body p-0">
-                            <div class="facet-search mb-2 px-2">
-                                <input type="text" class="form-control form-control-sm" placeholder="Поиск жанров...">
+            <?php if (!empty($aggs)) : ?>
+                <div class="accordion" id="filtersAccordion">
+                    <!-- Жанры -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#genreCollapse">
+                                <i class="bi bi-bookmark me-2"></i> Жанры
+                            </button>
+                        </h2>
+                        <div id="genreCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                            <div class="accordion-body p-0">
+                                <div class="facet-search mb-2 px-2">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Поиск жанров...">
+                                </div>
+                                <ul class="facet-list">
+                                    <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
+                                        <?php if (!empty($genre['key'])): ?>
+                                            <li>
+                                                <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>">
+                                                    <?= Html::encode($genre['key']) ?>
+                                                    <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
-                            <ul class="facet-list">
-                                <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
-                                    <?php if (!empty($genre['key'])): ?>
-                                        <li>
-                                            <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>">
-                                                <?= Html::encode($genre['key']) ?>
-                                                <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </ul>
                         </div>
                     </div>
-                </div>
 
-                <!-- Авторы -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
-                            <i class="bi bi-person me-2"></i> Авторы
-                        </button>
-                    </h2>
-                    <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
-                        <div class="accordion-body p-0">
-                            <div class="facet-search mb-2 px-2">
-                                <input type="text" class="form-control form-control-sm" placeholder="Поиск авторов...">
+                    <!-- Авторы -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
+                                <i class="bi bi-person me-2"></i> Авторы
+                            </button>
+                        </h2>
+                        <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                            <div class="accordion-body p-0">
+                                <div class="facet-search mb-2 px-2">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Поиск авторов...">
+                                </div>
+                                <ul class="facet-list">
+                                    <?php foreach ($aggs['aggregations']['author_group']['buckets'] as $author): ?>
+                                        <?php if (!empty($author['key'])): ?>
+                                            <li>
+                                                <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
+                                                    <?= Html::encode($author['key']) ?>
+                                                    <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
-                            <ul class="facet-list">
-                                <?php foreach ($aggs['aggregations']['author_group']['buckets'] as $author): ?>
-                                    <?php if (!empty($author['key'])): ?>
-                                        <li>
-                                            <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
-                                                <?= Html::encode($author['key']) ?>
-                                                <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </ul>
                         </div>
                     </div>
-                </div>
 
-                <!-- Названия -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#titleCollapse">
-                            <i class="bi bi-card-text me-2"></i> Названия
-                        </button>
-                    </h2>
-                    <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
-                        <div class="accordion-body p-0">
-                            <div class="facet-search mb-2 px-2">
-                                <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
+                    <!-- Названия -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#titleCollapse">
+                                <i class="bi bi-card-text me-2"></i> Названия
+                            </button>
+                        </h2>
+                        <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+                            <div class="accordion-body p-0">
+                                <div class="facet-search mb-2 px-2">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
+                                </div>
+                                <ul class="facet-list">
+                                    <?php foreach ($aggs['aggregations']['title_group']['buckets'] as $title): ?>
+                                        <?php if (!empty($title['key'])): ?>
+                                            <li>
+                                                <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
+                                                    <?= Html::encode(mb_substr($title['key'], 0, 30) . (mb_strlen($title['key']) > 30 ? '...' : '')) ?>
+                                                    <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
-                            <ul class="facet-list">
-                                <?php foreach ($aggs['aggregations']['title_group']['buckets'] as $title): ?>
-                                    <?php if (!empty($title['key'])): ?>
-                                        <li>
-                                            <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
-                                                <?= Html::encode(mb_substr($title['key'], 0, 30) . (mb_strlen($title['key']) > 30 ? '...' : '')) ?>
-                                                <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
-                                            </a>
-                                        </li>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php // Конец проверки if (!empty($aggs)) 
+            endif; ?>
         </div>
     </div>
 </div>

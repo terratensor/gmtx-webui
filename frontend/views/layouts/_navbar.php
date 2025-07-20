@@ -16,11 +16,11 @@ use yii\bootstrap5\NavBar;
         ],
     ]);
     $menuItems = [];
-    // $menuItems = [
-    //     ['label' => 'Home', 'url' => ['/site/index']],
-    //     ['label' => 'About', 'url' => ['/site/about']],
-    //     ['label' => 'Contact', 'url' => ['/site/contact']],
-    // ];
+    $menuItems = [
+        ['label' => 'Главная', 'url' => ['/site/index']],
+        ['label' => 'Библиотека', 'url' => ['/site/search'], 'visible' => Yii::$app->user->can('member')],
+        ['label' => 'Обратная связь', 'url' => ['/site/contact']],
+    ];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Signup', 'url' => ['/auth/join/request']];
     }
