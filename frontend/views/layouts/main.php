@@ -38,7 +38,7 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
         <?php $session = Yii::$app->session;
         $flashes = $session->getAllFlashes(); ?>
         <?php if ($flashes): ?>
-            <div class="container" style="margin: 40px;">
+            <div class="container">
                 <?= Alert::widget() ?>
             </div>
         <?php endif; ?>
