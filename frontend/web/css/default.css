@@ -573,6 +573,10 @@ input:focus:-ms-input-placeholder {
 }
 
 /* фасет жанры в строку */
+.search-setting-panel .sidebar-content {
+    padding: 1rem 0.2rem;
+}
+
 /* Общие стили для контейнеров с прокруткой */
 .scrollable-container {
     max-height: 300px;
