@@ -23,7 +23,7 @@
 
 main>.container,
 main>.container-fluid {
-    padding: 60px 15px 20px;
+    padding: 55px 15px 20px;
 }
 
 .footer>.container,
@@ -211,7 +211,7 @@ p.summary {
 
 .search-block {
     position: sticky;
-    top: 60px;
+    top: 55px;
     background: white;
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
