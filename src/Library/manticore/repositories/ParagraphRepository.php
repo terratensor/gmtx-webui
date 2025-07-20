@@ -77,10 +77,12 @@ class ParagraphRepository
 
         // Выполняем поиск если установлен фильтр или установлена строка поиска
         $search = $this->search->search($queryString);
-
-        $search->facet('genre', 'genre_group', $limit = 200, $sortField = 'genre', $sortDirection = 'asc');
-        $search->facet('author', 'author_group', $limit = 200);
-        $search->facet('title', 'title_group', $limit = 200);
+        $limit = 200;
+        $sortField = 'count(*)';
+        $sortDirection = 'desc';
+        $search->facet('genre', 'genre_group', $limit, $sortField, $sortDirection);
+        $search->facet('author', 'author_group', $limit, $sortField, $sortDirection);
+        $search->facet('title', 'title_group', $limit, $sortField, $sortDirection);
 
         // Включаем нечёткий поиск, если строка не пустая или не содержит символы, используемые в полнотекстовом поиске
         // и не содержит hash автварки пользователя
