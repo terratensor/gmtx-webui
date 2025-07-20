@@ -16,6 +16,7 @@ class SearchForm extends Model
     public string $text = '';
     public string $source_uuid = '';
     public bool $singleLineMode = false;
+    public bool $genreInlineView = false;
     // Включает нечёткий поиск 
     public bool $fuzzy = false;
 
@@ -29,7 +30,7 @@ class SearchForm extends Model
             ['text', 'string'],
             ['source_uuid', 'string'],
             // ['matching', 'in', 'range' => array_keys($this->getMatching())],
-            [['singleLineMode', 'fuzzy'], 'boolean'],
+            [['singleLineMode', 'fuzzy', 'genreInlineView'], 'boolean'],
         ];
     }
 

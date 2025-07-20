@@ -133,6 +133,9 @@ class SiteController extends Controller
         $form = new SearchForm();
         $errorQueryMessage = '';
 
+        // $aggs = $this->service->aggs($form);
+
+
         try {
             if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
 
@@ -149,6 +152,7 @@ class SiteController extends Controller
 
         return $this->render('search', [
             'results' => $results ?? null,
+            'aggs' => $aggs ?? [],
             'model' => $form,
             'errorQueryMessage' => $errorQueryMessage,
         ]);

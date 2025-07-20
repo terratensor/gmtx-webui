@@ -119,23 +119,30 @@ class ParagraphRepository
                     'genre_group' => [
                         'terms' => [
                             'field' => 'genre',
-                            'size' => 100
-                        ]
+                            'size' => 200
+                        ],
+                        // "sort" => [
+                        //     [
+                        //         "count(*)" => [
+                        //             "order" => "desc"
+                        //         ]
+                        //     ]
+                        // ]
                     ],
                     'author_group' => [
                         'terms' => [
                             'field' => 'author',
-                            'size' => 100
+                            'size' => 200
                         ]
                     ],
                     'title_group' => [
                         'terms' => [
                             'field' => 'title',
-                            'size' => 100
+                            'size' => 200
                         ]
                     ]
                 ],
-                'limit' => 0
+                'limit' => 1,
             ]
         ], true);
 
