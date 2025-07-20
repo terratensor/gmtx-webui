@@ -34,8 +34,9 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
     <?= $this->render('_navbar'); ?>
     <main role="main" class="flex-shrink-0 mb-3">
         <?php $this->render('_sidebar') ?>
-        <?= Alert::widget() ?>
-
+        <div class="container" style="margin: 40px;">
+            <?= Alert::widget() ?>
+        </div>
         <?= $content ?>
 
     </main>
