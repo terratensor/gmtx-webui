@@ -2,9 +2,7 @@
 
 use yii\bootstrap5\Html;
 use yii\data\Pagination;
-use yii\helpers\Markdown;
 use yii\bootstrap5\LinkPager;
-use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Breadcrumbs;
 use src\Search\forms\SearchForm;
 use frontend\widgets\ScrollWidget;
@@ -27,7 +25,7 @@ $this->params['aggs'] = $results->responseData ??  [];
 $this->title = Yii::$app->name;
 $this->params['breadcrumbs'][] = Yii::$app->name;
 
-$this->params['meta_description'] = 'Цитаты из 11 тысяч томов преимущественно русскоязычных авторов, в которых широко раскрыты большинство исторических событий — это документальная, научная, историческая литература, а также воспоминания, мемуары, дневники и письма, издававшиеся в форме собраний сочинений и художественной литературы';
+$this->params['meta_description'] = 'Библиотека';
 
 if ($results) {
     $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
@@ -54,6 +52,8 @@ echo Html::endForm();
                     <div class="card-body"><?= $errorQueryMessage; ?></div>
                 </div>
             <?php endif; ?>
+
+            <div class="lead">Начните вводить поисковый запрос</div>
 
         <?php endif; ?>
 

@@ -11,22 +11,24 @@ $this->title = 'Подтверждение email';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
 ?>
-<div class="site-resend-verification-email">
-    <h4><?= Html::encode($this->title) ?></h4>
+<div class="container">
+    <div class="site-resend-verification-email">
+        <h4><?= Html::encode($this->title) ?></h4>
 
-    <p>Заполните адрес электронной почты, на него будет отправлено электронное письмо для подтверждения email.</p>
+        <p>Заполните адрес электронной почты, на него будет отправлено электронное письмо для подтверждения email.</p>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'resend-verification-email-form']); ?>
+        <div class="row">
+            <div class="col-lg-5">
+                <?php $form = ActiveForm::begin(['id' => 'resend-verification-email-form']); ?>
 
-            <?= $form->field($model, 'email')->textInput(['autofocus' => true]) ?>
+                <?= $form->field($model, 'email')->textInput(['autofocus' => true]) ?>
 
-            <div class="form-group">
-                <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
+                <div class="form-group">
+                    <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
+                </div>
+
+                <?php ActiveForm::end(); ?>
             </div>
-
-            <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>

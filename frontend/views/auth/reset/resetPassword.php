@@ -11,22 +11,24 @@ $this->title = 'Сброс пароля';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
 ?>
-<div class="site-reset-password">
-    <h4><?= Html::encode($this->title) ?></h4>
+<div class="container">
+    <div class="site-reset-password">
+        <h4><?= Html::encode($this->title) ?></h4>
 
-    <p>Пожалуйста, введите свой новый пароль:</p>
+        <p>Пожалуйста, введите свой новый пароль:</p>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'reset-password-form']); ?>
+        <div class="row">
+            <div class="col-lg-5">
+                <?php $form = ActiveForm::begin(['id' => 'reset-password-form']); ?>
 
-            <?= $form->field($model, 'password')->passwordInput(['autofocus' => true]) ?>
+                <?= $form->field($model, 'password')->passwordInput(['autofocus' => true]) ?>
 
-            <div class="form-group">
-                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
+                <div class="form-group">
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
+                </div>
+
+                <?php ActiveForm::end(); ?>
             </div>
-
-            <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>

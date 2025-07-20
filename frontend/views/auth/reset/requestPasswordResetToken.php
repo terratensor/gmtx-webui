@@ -11,14 +11,15 @@ $this->title = 'Сброс пароля';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
 ?>
-<div class="site-request-password-reset">
-    <h4><?= Html::encode($this->title) ?></h4>
+<div class="container">
+    <div class="site-request-password-reset">
+        <h4><?= Html::encode($this->title) ?></h4>
 
-    <p>Заполните свой адрес электронной почты, на него будет отправлена ссылка для сброса пароля.</p>
+        <p>Заполните свой адрес электронной почты, на него будет отправлена ссылка для сброса пароля.</p>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'request-password-reset-form']); ?>
+        <div class="row">
+            <div class="col-lg-5">
+                <?php $form = ActiveForm::begin(['id' => 'request-password-reset-form']); ?>
 
                 <?= $form->field($model, 'email')->textInput(['autofocus' => true]) ?>
 
@@ -26,7 +27,8 @@ $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
                     <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
                 </div>
 
-            <?php ActiveForm::end(); ?>
+                <?php ActiveForm::end(); ?>
+            </div>
         </div>
     </div>
 </div>
