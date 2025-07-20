@@ -36,15 +36,8 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
         <?php $this->render('_sidebar') ?>
 
         <?php $session = Yii::$app->session;
-        $showAlert = false;
-        $flashes = $session->getAllFlashes();
-        foreach ($flashes as $type => $flash) {
-            if (isset($this->alertTypes[$type])) {
-                $showAlert = true;
-                break;
-            }
-        }; ?>
-        <?php if ($showAlert): ?>
+        $flashes = $session->getAllFlashes(); ?>
+        <?php if ($flashes): ?>
             <div class="container" style="margin: 40px;">
                 <?= Alert::widget() ?>
             </div>
