@@ -28,7 +28,7 @@ $aggs = $this->params['aggs'] ?? [];
                 ->label('Нечёткий поиск'); ?>
             <!-- Чекбокс для включения/выключения однострочного режима -->
             <?= $form->field($model, 'singleLineMode', [
-                'options' => ['class' => 'pb-2 single-line-mode'],
+                'options' => ['class' => 'single-line-mode'],
                 'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
                 'labelOptions' => ['class' => 'form-check-label'],
             ])->checkbox([
