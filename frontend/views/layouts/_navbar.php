@@ -8,7 +8,7 @@ use yii\bootstrap5\NavBar;
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Enable body scrolling</button>
     <?php
     NavBar::begin([
-        'brandImage' => '/img/logo.png',
+        'brandImage' => '/img/468415697-4edd1fa4-fc1c-46a9-a33f-fa2dbfdb040a.png',
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
