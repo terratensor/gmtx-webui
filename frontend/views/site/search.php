@@ -179,7 +179,7 @@ echo Html::endForm();
         <?php endif; ?>
 
         <!-- Пагинация -->
-        <div class="container container-pagination d-p">
+        <div class="container container-pagination d-p mt-2 mb-4">
             <div class="detachable">
                 <?= LinkPager::widget([
                     'pagination' => $pagination,

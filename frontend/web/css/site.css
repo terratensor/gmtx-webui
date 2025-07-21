@@ -202,7 +202,7 @@ p.summary {
     justify-content: center;
     width: 100%;
     bottom: 0;
-    position: sticky;
+    /* position: sticky; */
 }
 
 .container-pagination .detachable {
