@@ -19,6 +19,7 @@ class SearchForm extends Model
     public bool $genreInlineView = false;
     // Включает нечёткий поиск 
     public bool $fuzzy = false;
+    public string $matching = 'query_string';
 
     public function rules(): array
     {
@@ -29,19 +30,19 @@ class SearchForm extends Model
             ['title', 'string'],
             ['text', 'string'],
             ['source_uuid', 'string'],
-            // ['matching', 'in', 'range' => array_keys($this->getMatching())],
+            ['matching', 'in', 'range' => array_keys($this->getMatching())],
             [['singleLineMode', 'fuzzy', 'genreInlineView'], 'boolean'],
         ];
     }
 
-    // public function getMatching(): array
-    // {
-    //     return [
-    //         'query_string' => 'Обычный поиск',
-    //         'match_phrase' => 'Точное соответствие',
-    //         'match' => 'Любое слово',
-    //     ];
-    // }
+    public function getMatching(): array
+    {
+        return [
+            'query_string' => 'Обычный поиск',
+            'match_phrase' => 'Точное соответствие',
+            'match' => 'Любое слово',
+        ];
+    }
 
     public function formName(): string
     {
@@ -50,9 +51,6 @@ class SearchForm extends Model
 
     public function beforeValidate(): bool
     {
-        // if ($this->matching === self::MATCHING_IN) {
-        //     $this->badge = self::BADGE_ALL;
-        // }
         // Нормализуем поисковый запрос, удаляем лишние пробелы, url запроса остается без изменения, дл
         // но при следующей отправке нормализованного запроса будет уже обновленный url
         $this->query = SearchHelper::normalizeString($this->query, false);

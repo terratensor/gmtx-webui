@@ -77,12 +77,8 @@ class ParagraphRepository
 
         // Выполняем поиск если установлен фильтр или установлена строка поиска
         $search = $this->search->search($queryString);
-        $limit = 200;
-        $sortField = 'count(*)';
-        $sortDirection = 'desc';
-        $search->facet('genre', 'genre_group', $limit, $sortField, $sortDirection);
-        $search->facet('author', 'author_group', $limit, $sortField, $sortDirection);
-        $search->facet('title', 'title_group', $limit, $sortField, $sortDirection);
+        // Подготавливаем фасеты
+        $this->prepareFacets($search);
 
         // Включаем нечёткий поиск, если строка не пустая или не содержит символы, используемые в полнотекстовом поиске
         // и не содержит hash автварки пользователя
@@ -164,16 +160,22 @@ class ParagraphRepository
      */
     public function findByQueryStringMatch(
         string $queryString,
-        ?string $indexName = null,
         ?SearchForm $form = null
     ): Search {
-        $this->search->reset();
-        if ($indexName) {
-            // $this->setIndex($this->client->index($indexName));
-        }
-
         // Запрос переделан под фильтр
         $query = new BoolQuery();
+
+        if ($form->genre !== '') {
+            $this->search->filter('genre', 'in', $form->genre);
+        }
+
+        if ($form->author !== '') {
+            $this->search->filter('author', 'in', $form->author);
+        }
+
+        if ($form->title !== '') {
+            $this->search->filter('title', 'in', $form->title);
+        }
 
         if ($form->query) {
             $query->must(new MatchQuery($queryString, '*'));
@@ -185,9 +187,11 @@ class ParagraphRepository
         } else {
             throw new \DomainException('Задан пустой поисковый запрос');
         }
+        // Подготавливаем фасеты
+        $this->prepareFacets($search);
 
         $search->highlight(
-            ['genre', 'author', 'title', 'content'],
+            ['title', 'content'],
             [
                 'limit' => 0,
                 'no_match_size' => 0,
@@ -207,21 +211,27 @@ class ParagraphRepository
      */
     public function findByMatchPhrase(
         string $queryString,
-        ?string $indexName = null,
         ?SearchForm $form = null
     ): Search {
-        $this->search->reset();
-        if ($indexName) {
-            // $this->setIndex($this->client->index($indexName));
-        }
 
         // Запрос переделан под фильтр
         $query = new BoolQuery();
 
+        if ($form->genre !== '') {
+            $this->search->filter('genre', 'in', $form->genre);
+        }
+
+        if ($form->author !== '') {
+            $this->search->filter('author', 'in', $form->author);
+        }
+
+        if ($form->title !== '') {
+            $this->search->filter('title', 'in', $form->title);
+        }
+
         if ($form->query) {
             $query->must(new MatchPhrase($queryString, '*'));
         }
-
 
         // Выполняем поиск если установлен фильтр или установлен строка поиска
         if ($form->query) {
@@ -229,9 +239,11 @@ class ParagraphRepository
         } else {
             throw new \DomainException('Задан пустой поисковый запрос');
         }
+        // Подготавливаем фасеты
+        $this->prepareFacets($search);
 
         $search->highlight(
-            ['genre', 'author', 'title', 'content'],
+            ['title', 'content'],
             [
                 'limit' => 0,
                 'no_match_size' => 0,
@@ -440,5 +452,18 @@ class ParagraphRepository
             $layouts = ['ru', 'us'];
         }
         $search->option('layouts', $layouts);
+    }
+
+    /**
+     * @param Search $search
+     * @param int $limit
+     * @param string $sortField
+     * @param string $sortDirection
+     */
+    private function prepareFacets(Search $search, int $limit = 200, string $sortField = 'count(*)', string $sortDirection = 'desc'): void
+    {
+        $search->facet('genre', 'genre_group', $limit, $sortField, $sortDirection);
+        $search->facet('author', 'author_group', $limit, $sortField, $sortDirection);
+        $search->facet('title', 'title_group', $limit, $sortField, $sortDirection);
     }
 }

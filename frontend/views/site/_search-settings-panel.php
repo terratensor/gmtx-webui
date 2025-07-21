@@ -22,6 +22,9 @@ $aggs = $this->params['aggs'] ?? [];
         </div>
 
         <div class="sidebar-content">
+            <?= $form->field($model, 'matching', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])
+                ->radioList($model->getMatching(), ['class' => 'form-check-inline'])
+                ->label(false); ?>
             <!-- Чекбокс для включения/выключения нечёткого поиска -->
             <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
                 ->checkbox()

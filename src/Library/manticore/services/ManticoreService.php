@@ -26,7 +26,13 @@ class ManticoreService
     public function search(SearchForm $form): ParagraphDataProvider
     {
         $queryString = $form->query;
-        $comments = $this->paragraphRepository->findByQueryStringNew($queryString, $form);
+
+        $comments = match ($form->matching) {
+            'query_string' => $this->paragraphRepository->findByQueryStringNew($queryString, $form),
+            'match_phrase' => $this->paragraphRepository->findByMatchPhrase($queryString, $form),
+            'match' => $this->paragraphRepository->findByQueryStringMatch($queryString,  $form),
+        };
+
 
         $responseData = $comments->get()->getResponse()->getResponse();
 
