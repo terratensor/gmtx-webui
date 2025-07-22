@@ -161,9 +161,7 @@ class ParagraphRepository
     public function findByQueryStringMatch(
         string $queryString,
         ?SearchForm $form = null
-    ): Search {
-        // Запрос переделан под фильтр
-        $query = new BoolQuery();
+    ): Search {        
 
         if ($form->genre !== '') {
             $this->search->filter('genre', 'in', $form->genre);
@@ -177,16 +175,23 @@ class ParagraphRepository
             $this->search->filter('title', 'in', $form->title);
         }
 
-        if ($form->query) {
+        if ($form->query != "") {
+            // Запрос переделан под фильтр
+            $query = new BoolQuery();
             $query->must(new MatchQuery($queryString, '*'));
-        }
-
-        // Выполняем поиск если установлен фильтр или установлен строка поиска
-        if ($form->query) {
             $search = $this->search->search($query);
         } else {
-            throw new \DomainException('Задан пустой поисковый запрос');
+            $search = $this->search->search('');
         }
+
+
+
+        // Выполняем поиск если установлен фильтр или установлен строка поиска
+        // if ($form->query) {
+        //     $search = $this->search->search($query);
+        // } else {
+        //     throw new \DomainException('Задан пустой поисковый запрос');
+        // }
         // Подготавливаем фасеты
         $this->prepareFacets($search);
 
@@ -214,9 +219,6 @@ class ParagraphRepository
         ?SearchForm $form = null
     ): Search {
 
-        // Запрос переделан под фильтр
-        $query = new BoolQuery();
-
         if ($form->genre !== '') {
             $this->search->filter('genre', 'in', $form->genre);
         }
@@ -229,16 +231,21 @@ class ParagraphRepository
             $this->search->filter('title', 'in', $form->title);
         }
 
-        if ($form->query) {
+        if ($form->query != "") {
+            // Запрос переделан под фильтр
+            $query = new BoolQuery();
             $query->must(new MatchPhrase($queryString, '*'));
+            $search = $this->search->search($query);
+        } else {
+            $search = $this->search->search('');
         }
 
         // Выполняем поиск если установлен фильтр или установлен строка поиска
-        if ($form->query) {
-            $search = $this->search->search($query);
-        } else {
-            throw new \DomainException('Задан пустой поисковый запрос');
-        }
+        // if ($form->query) {
+        //     $search = $this->search->search($query);
+        // } else {
+        //     throw new \DomainException('Задан пустой поисковый запрос');
+        // }
         // Подготавливаем фасеты
         $this->prepareFacets($search);
 
