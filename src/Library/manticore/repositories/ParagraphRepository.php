@@ -16,6 +16,7 @@ use Manticoresearch\Query\BoolQuery;
 use src\Search\helpers\SearchHelper;
 use Manticoresearch\Query\MatchQuery;
 use Manticoresearch\Query\MatchPhrase;
+use Manticoresearch\Query\QueryString;
 use src\Library\manticore\models\Paragraph;
 
 
@@ -174,24 +175,13 @@ class ParagraphRepository
         if ($form->title !== '') {
             $this->search->filter('title', 'in', $form->title);
         }
-
-        if ($form->query != "") {
-            // Запрос переделан под фильтр
-            $query = new BoolQuery();
-            $query->must(new MatchQuery($queryString, '*'));
-            $search = $this->search->search($query);
+        
+        if ($form->query !== '') {
+            $search = $this->search->match($form->query , 'content');
         } else {
-            $search = $this->search->search('');
+            $search = $this->search->search($form->query , 'content');
         }
-
-
-
-        // Выполняем поиск если установлен фильтр или установлен строка поиска
-        // if ($form->query) {
-        //     $search = $this->search->search($query);
-        // } else {
-        //     throw new \DomainException('Задан пустой поисковый запрос');
-        // }
+        
         // Подготавливаем фасеты
         $this->prepareFacets($search);
 
@@ -218,34 +208,29 @@ class ParagraphRepository
         string $queryString,
         ?SearchForm $form = null
     ): Search {
+        
+        $query = new BoolQuery();
 
         if ($form->genre !== '') {
-            $this->search->filter('genre', 'in', $form->genre);
+            $query->should(new In('genre', [$form->genre]));
         }
 
         if ($form->author !== '') {
-            $this->search->filter('author', 'in', $form->author);
+            $query->should(new In('author', [$form->author]));
         }
 
         if ($form->title !== '') {
-            $this->search->filter('title', 'in', $form->title);
+            $query->should(new In('title', [$form->title]));
         }
 
-        if ($form->query != "") {
-            // Запрос переделан под фильтр
-            $query = new BoolQuery();
-            $query->must(new MatchPhrase($queryString, '*'));
-            $search = $this->search->search($query);
+        if ($form->query !== '') {
+            $query->must(new MatchPhrase($form->query, 'content'));
         } else {
-            $search = $this->search->search('');
+            $query->must(new QueryString($queryString, 'content'));
         }
+        
+        $search = $this->search->search($query);
 
-        // Выполняем поиск если установлен фильтр или установлен строка поиска
-        // if ($form->query) {
-        //     $search = $this->search->search($query);
-        // } else {
-        //     throw new \DomainException('Задан пустой поисковый запрос');
-        // }
         // Подготавливаем фасеты
         $this->prepareFacets($search);
 
