@@ -10,6 +10,8 @@ use InvalidArgumentException;
 
 class SearchHelper
 {
+    public const EMPTY_GENRE = "Не установлен";
+    public const EMPTY_AUTHOR = "Не установлен";
     public static array $charactersList = ['!', '"', '$', "'", '(', ')', '-', '/', '<', '@', '\\', '^', '|', '~'];
 
     /**

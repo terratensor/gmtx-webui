@@ -1,9 +1,9 @@
 <?php
 
-
 use yii\bootstrap5\Html;
 use src\Search\forms\SearchForm;
 use src\Search\helpers\UrlHelper;
+use src\Search\helpers\SearchHelper;
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap5\ActiveForm $form */
@@ -77,6 +77,13 @@ $aggs = $this->params['aggs'] ?? [];
                                                         <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
                                                     </a>
                                                 </li>
+                                            <?php else: ?>
+                                                <li class="genre-item">
+                                                    <a href="<?= UrlHelper::addSearchParam('genre', SearchHelper::EMPTY_GENRE) ?>">
+                                                        <?= Html::encode(SearchHelper::EMPTY_GENRE) ?>
+                                                        <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                                                    </a>
+                                                </li>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     </ul>
@@ -87,6 +94,11 @@ $aggs = $this->params['aggs'] ?? [];
                                                 <?php if (!empty($genre['key'])): ?>
                                                     <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>" class="genre-tag genre-item">
                                                         <?= Html::encode($genre['key']) ?>
+                                                        <span class="badge bg-secondary"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a href="<?= UrlHelper::addSearchParam('genre', SearchHelper::EMPTY_GENRE) ?>" class="genre-tag genre-item">
+                                                        <?= Html::encode(SearchHelper::EMPTY_GENRE) ?>
                                                         <span class="badge bg-secondary"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
                                                     </a>
                                                 <?php endif; ?>
@@ -117,6 +129,13 @@ $aggs = $this->params['aggs'] ?? [];
                                             <li>
                                                 <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
                                                     <?= Html::encode($author['key']) ?>
+                                                    <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
+                                                </a>
+                                            </li>
+                                        <?php else: ?>
+                                            <li>
+                                                <a href="<?= UrlHelper::addSearchParam('author', SearchHelper::EMPTY_AUTHOR) ?>">
+                                                    <?= Html::encode(SearchHelper::EMPTY_AUTHOR) ?>
                                                     <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
                                                 </a>
                                             </li>

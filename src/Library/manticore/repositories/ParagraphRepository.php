@@ -55,11 +55,19 @@ class ParagraphRepository
         $queryString = SearchHelper::escapeUnclosedBrackets($queryString);
 
         if ($form->genre !== '') {
-            $this->search->filter('genre', 'in', $form->genre);
+            if ($form->genre === SearchHelper::EMPTY_GENRE) {
+                $this->search->filter('genre', 'equals', "");
+            } else {
+                $this->search->filter('genre', 'in', $form->genre);
+            }
         }
 
         if ($form->author !== '') {
-            $this->search->filter('author', 'in', $form->author);
+            if ($form->author === SearchHelper::EMPTY_AUTHOR) {
+                $this->search->filter('author', 'equals', "");
+            } else {
+                $this->search->filter('author', 'in', $form->author);
+            }
         }
 
         if ($form->title !== '') {
@@ -162,26 +170,34 @@ class ParagraphRepository
     public function findByQueryStringMatch(
         string $queryString,
         ?SearchForm $form = null
-    ): Search {        
+    ): Search {
 
         if ($form->genre !== '') {
-            $this->search->filter('genre', 'in', $form->genre);
+            if ($form->genre === SearchHelper::EMPTY_GENRE) {
+                $this->search->filter('genre', 'equals', "");
+            } else {
+                $this->search->filter('genre', 'in', $form->genre);
+            }
         }
 
         if ($form->author !== '') {
-            $this->search->filter('author', 'in', $form->author);
+            if ($form->author === SearchHelper::EMPTY_AUTHOR) {
+                $this->search->filter('author', 'equals', '');
+            } else {
+                $this->search->filter('author', 'in', $form->author);
+            }
         }
 
         if ($form->title !== '') {
             $this->search->filter('title', 'in', $form->title);
         }
-        
+
         if ($form->query !== '') {
-            $search = $this->search->match($form->query , 'content');
+            $search = $this->search->match($form->query, 'content');
         } else {
-            $search = $this->search->search($form->query , 'content');
+            $search = $this->search->search($form->query);
         }
-        
+
         // Подготавливаем фасеты
         $this->prepareFacets($search);
 
@@ -208,15 +224,23 @@ class ParagraphRepository
         string $queryString,
         ?SearchForm $form = null
     ): Search {
-        
+
         $query = new BoolQuery();
 
         if ($form->genre !== '') {
-            $query->should(new In('genre', [$form->genre]));
+            if ($form->genre === SearchHelper::EMPTY_GENRE) {
+                $query->should(new In('genre', ['']));
+            } else {
+                $query->should(new In('genre', [$form->genre]));
+            }
         }
 
         if ($form->author !== '') {
-            $query->should(new In('author', [$form->author]));
+            if ($form->author === SearchHelper::EMPTY_AUTHOR) {
+                $query->should(new In('author', ['']));
+            } else {
+                $query->should(new In('author', [$form->author]));
+            }
         }
 
         if ($form->title !== '') {
@@ -226,9 +250,9 @@ class ParagraphRepository
         if ($form->query !== '') {
             $query->must(new MatchPhrase($form->query, 'content'));
         } else {
-            $query->must(new QueryString($queryString, 'content'));
+            $query->must(new QueryString($queryString));
         }
-        
+
         $search = $this->search->search($query);
 
         // Подготавливаем фасеты
