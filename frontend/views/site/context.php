@@ -66,9 +66,8 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
                 class="<?= $fragment == $paragraph->chunk ? "card border-secondary" : "" ?>">
                 <div class="card-body">
 
-                  <div class="paragraph-text">
-                    <?= $paragraph->content; ?>
-                    <?php // SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', false); ?>
+                  <div class="paragraph-text">                    
+                    <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', false); ?>
                   </div>
                 </div>
               </div>
