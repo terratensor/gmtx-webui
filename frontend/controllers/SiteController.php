@@ -55,7 +55,7 @@ class SiteController extends Controller
                 'only' => ['search'], // Указываем, к каким действиям применяем контроль
                 'rules' => [
                     [
-                        'actions' => ['search'],
+                        'actions' => ['search', 'context'],
                         'allow' => true,
                         'roles' => ['member'], // Только пользователи с ролью member
                     ],

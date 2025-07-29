@@ -21,7 +21,7 @@ use yii\bootstrap5\NavBar;
         ['label' => 'Обратная связь', 'url' => ['/site/contact']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/auth/join/request']];
+        $menuItems[] = ['label' => 'Регистрация', 'url' => ['/auth/join/request']];
     }
 
     echo Nav::widget([
