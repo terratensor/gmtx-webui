@@ -685,3 +685,14 @@ input:focus:-ms-input-placeholder {
     margin-bottom: 0;
     font-weight: bold;
 }
+
+/* Контекст */
+[id] {
+    scroll-margin-top: 20px; /* Компенсация для фиксированного header'а */
+    transition: background-color 0.3s ease;
+}
+
+.card-border-secondary {
+    background-color: rgba(0, 123, 255, 0.05);
+    transition: background-color 0.3s ease;
+}

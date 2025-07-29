@@ -28,10 +28,10 @@ $this->params['breadcrumbs'][] = Yii::$app->name;
 $this->params['meta_description'] = 'Библиотека';
 
 if ($results) {
-    $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
+  $this->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
 } else {
-    $this->registerLinkTag(['rel' => 'canonical', 'href' => Yii::$app->params['frontendHostInfo']]);
-    $this->registerMetaTag(['name' => 'robots', 'content' => 'index, nofollow']);
+  $this->registerLinkTag(['rel' => 'canonical', 'href' => Yii::$app->params['frontendHostInfo']]);
+  $this->registerMetaTag(['name' => 'robots', 'content' => 'index, nofollow']);
 }
 
 /** Quote form block  */
@@ -42,158 +42,156 @@ echo Html::endForm();
 
 ?>
 <div class="site-index">
-    <?= $this->render('_search-panel', ['model' => $model]); ?>
-    <div class="container-fluid search-results">
+  <?= $this->render('_search-panel', ['model' => $model]); ?>
+  <div class="container-fluid search-results">
 
-        <?php if (!$results): ?>
+    <?php if (!$results): ?>
 
-            <?php if ($errorQueryMessage): ?>
-                <div class="card border-danger mb-3">
-                    <div class="card-body"><?= $errorQueryMessage; ?></div>
-                </div>
-            <?php endif; ?>
-
-            <div class="lead">Начните вводить поисковый запрос</div>
-
-        <?php endif; ?>
-
-        <?php if ($results): ?>
-            <?php
-            // Property totalCount пусто пока не вызваны данные модели getModels(),
-            // сначала получаем массив моделей, потом получаем общее их количество
-            /** @var Paragraph[] $paragraphs */
-            $paragraphs = $results->getModels();
-            $queryParams = Yii::$app->request->queryParams;
-            $pagination = new Pagination(
-                [
-                    'totalCount' => $results->getTotalCount(),
-                    'defaultPageSize' => Yii::$app->params['searchResults']['pageSize'],
-                    'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
-                ]
-            );
-            ?>
-            <div class="row">
-                <div class="col-md-12">
-                    <?php if ($pagination->totalCount === 0): ?>
-                        <h5>По вашему запросу ничего не найдено</h5>
-                    <?php else: ?>
-                        <div class="row">
-                            <div class="col-md-8 d-flex align-items-center">
-                                <?= SearchResultsSummary::widget(['pagination' => $pagination]); ?>
-                            </div>
-                        </div>
-                        <?php foreach ($paragraphs as $paragraph): ?>
-                            <div class="card mt-4">
-                                <div class="card-header d-flex justify-content-between">
-                                    <?= Breadcrumbs::widget([
-                                        'homeLink' => false,
-                                        'links' => array_filter([
-                                            !empty($paragraph->genre) ? [
-                                                'label' => $paragraph->genre,
-                                                'url' => SearchHelper::getFilterUrl('genre', $paragraph->genre),
-                                                'active' => !empty($model->genre) && $model->genre === $paragraph->genre ? ' active-filter' : '',
-                                                'data-bs-toggle' => 'tooltip',
-                                                'data-bs-title' => !empty($model->genre) && $model->genre === $paragraph->genre ? 'Нажмите чтобы снять фильтр' : 'Нажмите чтобы фильтровать по жанру'
-                                            ] : null,
-                                            !empty($paragraph->author) ? [
-                                                'label' => $paragraph->author,
-                                                'url' => SearchHelper::getFilterUrl('author', $paragraph->author),
-                                                'active' => !empty($model->author) && $model->author === $paragraph->author ? ' active-filter' : '',
-                                                'data-bs-toggle' => 'tooltip',
-                                                'data-bs-title' => !empty($model->author) && $model->author === $paragraph->author ? 'Нажмите чтобы снять фильтр' : 'Нажмите чтобы фильтровать по автору'
-                                            ] : null,
-                                            !empty($paragraph->title) ? [
-                                                'label' => $paragraph->title,
-                                                'url' => SearchHelper::getFilterUrl('title', $paragraph->title),
-                                                'active' => !empty($model->title) && $model->title === $paragraph->title ? ' active-filter' : '',
-                                                'data-bs-toggle' => 'tooltip',
-                                                'data-bs-title' => !empty($model->title) && $model->title === $paragraph->title ? 'Нажмите чтобы снять фильтр' : 'Нажмите чтобы фильтровать по наименованию'
-                                            ] : null,
-                                        ]),
-                                    ]); ?>
-                                    <div class="paragraph-context d-print-none">
-                                        <?php $total = ceil($paragraph->chunk / Yii::$app->params['context']['pageSize']); ?>
-                                        <?= Html::a(
-                                            'контекст',
-                                            [
-                                                'site/context',
-                                                'id' => $paragraph->id,
-                                                'page' => $total,
-                                                'f' => $paragraph->chunk,
-                                                '#' => $paragraph->chunk
-                                            ],
-                                            [
-                                                'class' => 'btn btn-link btn-context paragraph-context',
-                                                'target' => '_blank'
-                                            ]
-                                        ); ?>
-
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="py-xl-5 py-3 px-xl-5 px-lg-5 px-md-5 px-sm-3 paragraph" data-entity-id="<?= $paragraph->id; ?>">
-                                        <!-- <h5><?php SearchResultHelper::highlightFieldContent($paragraph, 'title'); ?></h4> -->
-                                        <div class=" paragraph-text">
-                                            <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', $model->singleLineMode); ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <!-- Левый блок с иконками и статистикой -->
-                                        <div class="icons-stats d-flex align-items-center gap-3">
-                                            <div class="icons d-print-none d-flex align-items-center gap-2">
-                                                <i id="bookmark-<?= $paragraph->id ?>" class="bi bi-bookmark" style="font-size: 1.2rem;  margin-top: -8px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                    data-bs-title="Добавить в закладки"
-                                                    data-href="/bookmark?id=<?= $paragraph->id ?>"
-                                                    data-method="post"></i>
-                                                <i id="share-<?= $paragraph->id ?>" class="bi bi-share" style="font-size: 1.2rem;  margin-top: -8px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                                    data-bs-title="Поделиться"></i>
-                                            </div>
-                                            <div class="text-muted small" style="line-height: 1.2; padding-top: 2px">
-                                                Символов: <?= $paragraph->char_count ?>, слов: <?= $paragraph->word_count ?>
-                                            </div>
-                                        </div>
-
-                                        <!-- Правый блок с источником -->
-                                        <div class="source d-flex align-items-center gap-2">
-                                            <span data-bs-toggle="tooltip" data-bs-placement="left"
-                                                data-bs-title="<?= Html::encode($paragraph->source) ?>"
-                                                style="line-height: 1.2">
-                                                Источник
-                                            </span>
-                                            <i class="bi bi-clipboard copy-source"
-                                                style="cursor: pointer; font-size: 1.2rem; margin-top: -8px"
-                                                data-bs-toggle="tooltip" data-bs-placement="left"
-                                                data-bs-title="Копировать источник"
-                                                data-source="<?= Html::encode($paragraph->source) ?>"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                </div>
-            </div>
-
-        <?php endif; ?>
-
-        <!-- Пагинация -->
-        <div class="container container-pagination d-p mt-2 mb-4">
-            <div class="detachable">
-                <?= LinkPager::widget([
-                    'pagination' => $pagination,
-                    'firstPageLabel' => true,
-                    'lastPageLabel' => false,
-                    'maxButtonCount' => 5,
-                    'options' => ['class' => 'd-flex justify-content-center'],
-                    'listOptions' => ['class' => 'pagination mb-0']
-                ]); ?>
-            </div>
+      <?php if ($errorQueryMessage): ?>
+        <div class="card border-danger mb-3">
+          <div class="card-body"><?= $errorQueryMessage; ?></div>
         </div>
+      <?php endif; ?>
 
+      <div class="lead">Начните вводить поисковый запрос</div>
+
+    <?php endif; ?>
+
+    <?php if ($results): ?>
+      <?php
+      // Property totalCount пусто пока не вызваны данные модели getModels(),
+      // сначала получаем массив моделей, потом получаем общее их количество
+      /** @var Paragraph[] $paragraphs */
+      $paragraphs = $results->getModels();
+      $queryParams = Yii::$app->request->queryParams;
+      $pagination = new Pagination(
+        [
+          'totalCount' => $results->getTotalCount(),
+          'defaultPageSize' => Yii::$app->params['searchResults']['pageSize'],
+          'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
+        ]
+      );
+      ?>
+      <div class="row">
+        <div class="col-md-12">
+          <?php if ($pagination->totalCount === 0): ?>
+            <h5>По вашему запросу ничего не найдено</h5>
+          <?php else: ?>
+            <div class="row">
+              <div class="col-md-8 d-flex align-items-center">
+                <?= SearchResultsSummary::widget(['pagination' => $pagination]); ?>
+              </div>
+            </div>
+            <?php foreach ($paragraphs as $paragraph): ?>
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between">
+                  <?= Breadcrumbs::widget([
+                    'homeLink' => false,
+                    'links' => array_filter([
+                      !empty($paragraph->genre) ? [
+                        'label' => $paragraph->genre,
+                        'url' => SearchHelper::getFilterUrl('genre', $paragraph->genre),
+                        'active' => !empty($model->genre) && $model->genre === $paragraph->genre ? ' active-filter' : '',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-title' => !empty($model->genre) && $model->genre === $paragraph->genre ? 'Нажмите чтобы снять фильтр' : 'Нажмите чтобы фильтровать по жанру'
+                      ] : null,
+                      !empty($paragraph->author) ? [
+                        'label' => $paragraph->author,
+                        'url' => SearchHelper::getFilterUrl('author', $paragraph->author),
+                        'active' => !empty($model->author) && $model->author === $paragraph->author ? ' active-filter' : '',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-title' => !empty($model->author) && $model->author === $paragraph->author ? 'Нажмите чтобы снять фильтр' : 'Нажмите чтобы фильтровать по автору'
+                      ] : null,
+                      !empty($paragraph->title) ? [
+                        'label' => $paragraph->title,
+                        'url' => SearchHelper::getFilterUrl('title', $paragraph->title),
+                        'active' => !empty($model->title) && $model->title === $paragraph->title ? ' active-filter' : '',
+                        'data-bs-toggle' => 'tooltip',
+                        'data-bs-title' => !empty($model->title) && $model->title === $paragraph->title ? 'Нажмите чтобы снять фильтр' : 'Нажмите чтобы фильтровать по наименованию'
+                      ] : null,
+                    ]),
+                  ]); ?>
+                  <div class="paragraph-context d-print-none">
+                    <?php $total = ceil($paragraph->chunk / Yii::$app->params['context']['pageSize']); ?>
+                    <?= Html::a(
+                      'контекст',
+                      [
+                        'site/context',
+                        'id' => $paragraph->id,
+                        'page' => $total,
+                        '#' => $paragraph->chunk // Используем только якорь
+                      ],
+                      [
+                        'class' => 'btn btn-link btn-context paragraph-context',
+                        'target' => '_blank'
+                      ]
+                    ); ?>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="py-xl-5 py-3 px-xl-5 px-lg-5 px-md-5 px-sm-3 paragraph" data-entity-id="<?= $paragraph->id; ?>">
+                    <!-- <h5><?php SearchResultHelper::highlightFieldContent($paragraph, 'title'); ?></h4> -->
+                    <div class=" paragraph-text">
+                      <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', $model->singleLineMode); ?>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <!-- Левый блок с иконками и статистикой -->
+                    <div class="icons-stats d-flex align-items-center gap-3">
+                      <div class="icons d-print-none d-flex align-items-center gap-2">
+                        <i id="bookmark-<?= $paragraph->id ?>" class="bi bi-bookmark" style="font-size: 1.2rem;  margin-top: -8px"
+                          data-bs-toggle="tooltip" data-bs-placement="bottom"
+                          data-bs-title="Добавить в закладки"
+                          data-href="/bookmark?id=<?= $paragraph->id ?>"
+                          data-method="post"></i>
+                        <i id="share-<?= $paragraph->id ?>" class="bi bi-share" style="font-size: 1.2rem;  margin-top: -8px"
+                          data-bs-toggle="tooltip" data-bs-placement="bottom"
+                          data-bs-title="Поделиться"></i>
+                      </div>
+                      <div class="text-muted small" style="line-height: 1.2; padding-top: 2px">
+                        Символов: <?= $paragraph->char_count ?>, слов: <?= $paragraph->word_count ?>
+                      </div>
+                    </div>
+
+                    <!-- Правый блок с источником -->
+                    <div class="source d-flex align-items-center gap-2">
+                      <span data-bs-toggle="tooltip" data-bs-placement="left"
+                        data-bs-title="<?= Html::encode($paragraph->source) ?>"
+                        style="line-height: 1.2">
+                        Источник
+                      </span>
+                      <i class="bi bi-clipboard copy-source"
+                        style="cursor: pointer; font-size: 1.2rem; margin-top: -8px"
+                        data-bs-toggle="tooltip" data-bs-placement="left"
+                        data-bs-title="Копировать источник"
+                        data-source="<?= Html::encode($paragraph->source) ?>"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+        </div>
+      </div>
+
+    <?php endif; ?>
+
+    <!-- Пагинация -->
+    <div class="container container-pagination d-p mt-2 mb-4">
+      <div class="detachable">
+        <?= LinkPager::widget([
+          'pagination' => $pagination,
+          'firstPageLabel' => true,
+          'lastPageLabel' => false,
+          'maxButtonCount' => 5,
+          'options' => ['class' => 'd-flex justify-content-center'],
+          'listOptions' => ['class' => 'pagination mb-0']
+        ]); ?>
+      </div>
     </div>
+
+  </div>
 </div>
 
 <?= $this->render('_theme-toggler'); ?>

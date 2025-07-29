@@ -107,59 +107,93 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
 
 <?php
 $js = <<<JS
+  // Оптимизированная версия getVisibleFragment с бинарным поиском и проверкой видимости
+  function getVisibleFragment() {
+      const windowHeight = $(window).height();
+      const scrollTop = $(window).scrollTop();
+      const scrollBottom = scrollTop + windowHeight;
+      
+      const fragments = $('.paragraph > div[id]');
+      if (fragments.length === 0) return null;
+      
+      // Бинарный поиск по позиции прокрутки
+      let low = 0;
+      let high = fragments.length - 1;
+      let bestMatch = null;
+      let bestMatchVisibility = 0; // Запоминаем насколько хорошо виден фрагмент
+      
+      while (low <= high) {
+          const mid = Math.floor((low + high) / 2);
+          const fragment = $(fragments[mid]);
+          const fragmentTop = fragment.offset().top;
+          const fragmentHeight = fragment.height();
+          const fragmentBottom = fragmentTop + fragmentHeight;
+          
+          // Вычисляем видимую часть фрагмента (в процентах)
+          const visibleTop = Math.max(scrollTop, fragmentTop);
+          const visibleBottom = Math.min(scrollBottom, fragmentBottom);
+          const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+          const visibilityPercent = (visibleHeight / fragmentHeight) * 100;
+          
+          // Если видно более 30% фрагмента - считаем его текущим
+          if (visibilityPercent > 30) {
+              return fragment.attr('id');
+          }
+          
+          // Запоминаем наиболее видимый фрагмент
+          if (visibilityPercent > bestMatchVisibility) {
+              bestMatchVisibility = visibilityPercent;
+              bestMatch = fragment.attr('id');
+          }
+          
+          // Продолжаем бинарный поиск
+          if (fragmentBottom < scrollTop) {
+              low = mid + 1;
+          } else if (fragmentTop > scrollBottom) {
+              high = mid - 1;
+          } else {
+              // Если фрагмент частично виден, но менее 30% - прерываем поиск
+              break;
+          }
+      }
+      
+      return bestMatch;
+  }
+
+  // Проверка валидности фрагмента при загрузке страницы
+  function validateInitialFragment() {
+    const initialFragment = window.location.hash.substring(1);
+    if (initialFragment) {
+        // Проверяем существует ли элемент с таким ID
+        if (!$('#' + initialFragment).length) {
+            // Если фрагмент не найден, удаляем hash из URL
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+            return null;
+        }
+        return initialFragment;
+    }
+    return null;
+  }  
+
 $(document).ready(function() {
+    const validFragment = validateInitialFragment();
+    if (validFragment) {
+        // Прокрутка к фрагменту с небольшим отступом сверху
+        setTimeout(() => {
+            $('html, body').stop().animate({
+                scrollTop: $('#' + validFragment).offset().top - 20
+            }, 100);
+            $('#' + validFragment).addClass('card border-secondary');
+        }, 50);
+    }
+
     // Функция для обновления URL без перезагрузки страницы
     function updateUrlFragment(fragment) {
         if (history.replaceState) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('f', fragment);
+            const url = new URL(window.location);
+            url.hash = '#' + fragment;
             history.replaceState(null, '', url.toString());
         }
-    }
-
-    // Оптимизированная версия getVisibleFragment
-    function getVisibleFragment() {
-        const windowHeight = $(window).height();
-        const scrollTop = $(window).scrollTop();
-        const scrollBottom = scrollTop + windowHeight;
-        
-        // Бинарный поиск по позиции прокрутки
-        const fragments = $('.paragraph > div[id]');
-        let low = 0;
-        let high = fragments.length - 1;
-        let bestMatch = null;
-        let bestMatchDiff = Infinity;
-        
-        while (low <= high) {
-            const mid = Math.floor((low + high) / 2);
-            const fragment = $(fragments[mid]);
-            const fragmentTop = fragment.offset().top;
-            const fragmentBottom = fragmentTop + fragment.height();
-            const fragmentMiddle = fragmentTop + fragment.height() / 2;
-            
-            // Проверяем, находится ли середина фрагмента в видимой области
-            if (fragmentMiddle >= scrollTop && fragmentMiddle <= scrollBottom) {
-                return fragment.attr('id');
-            }
-            
-            // Ищем ближайший фрагмент
-            const diffTop = Math.abs(fragmentTop - scrollTop);
-            const diffBottom = Math.abs(fragmentBottom - scrollBottom);
-            const minDiff = Math.min(diffTop, diffBottom);
-            
-            if (minDiff < bestMatchDiff) {
-                bestMatchDiff = minDiff;
-                bestMatch = fragment.attr('id');
-            }
-            
-            if (fragmentBottom < scrollTop) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
-            }
-        }
-        
-        return bestMatch;
     }
 
     // Обработчик прокрутки с троттлингом
@@ -176,12 +210,6 @@ $(document).ready(function() {
             }
         }, 150); // Задержка в 150мс
     });
-
-    // Инициализация при загрузке
-    const initialFragment = '$fragment';
-    if (initialFragment && $('#' + initialFragment).length) {
-        $('#' + initialFragment).addClass('card border-secondary');
-    }
 
     // Обновление прогресса чтения
     function updateReadingProgress() {
