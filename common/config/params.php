@@ -51,6 +51,7 @@ return [
 
     'searchResults' => [
         'pageSize' => (int)getenv('PAGE_SIZE') ?: 50,
+        'pageSizeLimit' => getenv('PAGE_SIZE_LIMIT') ?: [1, 100],
     ],
 
     'indexes' => [

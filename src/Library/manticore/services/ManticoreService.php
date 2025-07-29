@@ -41,6 +41,7 @@ class ManticoreService
                 'query' => $comments,
                 'pagination' => [
                     'pageSize' => Yii::$app->params['searchResults']['pageSize'],
+                    'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
                 ],
                 'sort' => [
                     //                 'defaultOrder' => [
