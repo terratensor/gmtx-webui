@@ -5,7 +5,7 @@ declare(strict_types=1);
 use yii\data\Pagination;
 use yii\bootstrap5\LinkPager;
 use frontend\widgets\ScrollWidget;
-use src\Search\helpers\TextProcessor;
+use src\Search\helpers\SearchResultHelper;
 use src\Library\manticore\models\Paragraph;
 use src\Library\manticore\repositories\ParagraphDataProvider;
 
@@ -64,7 +64,7 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
                                 <div class="card-body">
 
                                     <div class="paragraph-text">
-                                        <?= TextProcessor::widget(['text' => $paragraph->content]); ?>
+                                          <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', false); ?>
                                     </div>
                                 </div>
                             </div>
