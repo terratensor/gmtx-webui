@@ -112,7 +112,7 @@ echo Html::endForm();
                                         ]),
                                     ]); ?>
                                     <div class="paragraph-context d-print-none">
-                                        <?php $total = ceil($paragraph->chunk / $pagination->pageSize); ?>
+                                        <?php $total = ceil($paragraph->chunk / Yii::$app->params['context']['pageSize']); ?>
                                         <?= Html::a(
                                             'контекст',
                                             [

@@ -8,7 +8,7 @@ use frontend\widgets\ScrollWidget;
 use src\Search\helpers\SearchResultHelper;
 use src\Library\manticore\models\Paragraph;
 use src\Library\manticore\repositories\ParagraphDataProvider;
-
+ini_set('memory_limit', '256M'); // или больше, если нужно
 
 /** @var yii\web\View $this */
 /** @var ParagraphDataProvider $results */
@@ -67,7 +67,8 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
                 <div class="card-body">
 
                   <div class="paragraph-text">
-                    <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', false); ?>
+                    <?= $paragraph->content; ?>
+                    <?php // SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', false); ?>
                   </div>
                 </div>
               </div>
