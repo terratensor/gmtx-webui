@@ -136,7 +136,7 @@ function getVisibleFragment() {
         const visibilityPercent = (visibleHeight / fragmentHeight) * 100;
         
         // Если видно более 30% фрагмента - считаем его текущим
-        if (visibilityPercent > 15) {
+        if (visibilityPercent > 30) {
             return fragment.attr('id');
         }
         
