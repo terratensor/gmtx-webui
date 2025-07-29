@@ -50,8 +50,13 @@ return [
     ],
 
     'searchResults' => [
-        'pageSize' => (int)getenv('PAGE_SIZE') ?: 50,
-        'pageSizeLimit' => getenv('PAGE_SIZE_LIMIT') ?: [1, 100],
+        'pageSize' => (int)getenv('SEARCH_PAGE_SIZE') ?: 100,
+        'pageSizeLimit' => getenv('SEARCH_PAGE_SIZE_LIMIT') ?: [1, 1000],
+    ],
+
+    'context' => [
+        'pageSize' => (int)getenv('CONTEXT_PAGE_SIZE') ?: 5000,
+        'pageSizeLimit' => getenv('CONTEXT_PAGE_SIZE_LIMIT') ?: [1, 5000],
     ],
 
     'indexes' => [

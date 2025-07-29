@@ -31,18 +31,23 @@ class ManticoreService
             'query_string' => $this->paragraphRepository->findByQueryStringNew($queryString, $form),
             'match_phrase' => $this->paragraphRepository->findByMatchPhrase($queryString, $form),
             'match' => $this->paragraphRepository->findByQueryStringMatch($queryString,  $form),
+            'context' => $this->paragraphRepository->findByContext($form, $indexName ?? null),
         };
 
 
         $responseData = $comments->get()->getResponse()->getResponse();
-
+        // Определяем параметры пагинации
+        $pagination = $form->matching === 'context' ? [
+            'pageSize' => Yii::$app->params['context']['pageSize'],
+            'pageSizeLimit' => Yii::$app->params['context']['pageSizeLimit'],
+        ] : [
+            'pageSize' => Yii::$app->params['searchResults']['pageSize'],
+            'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
+        ];
         return new ParagraphDataProvider(
             [
                 'query' => $comments,
-                'pagination' => [
-                    'pageSize' => Yii::$app->params['searchResults']['pageSize'],
-                    'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
-                ],
+                'pagination' => $pagination,
                 'sort' => [
                     //                 'defaultOrder' => [
                     //     'id' => SORT_ASC,

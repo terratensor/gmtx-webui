@@ -279,12 +279,7 @@ class ParagraphRepository
      * The search is carried out by genre, author, title
      */
     public function findByContext(SearchForm $form, ?string $indexName = null): Search
-    {
-        $this->search->reset();
-        if ($indexName) {
-            // $this->setIndex($this->client->index($indexName));
-        }
-
+    {    
         // Запрос переделан под фильтр
         $query = new BoolQuery();
 
