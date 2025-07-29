@@ -60,7 +60,7 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
                     <div class="px-xl-5 px-lg-5 px-md-5 px-sm-3 paragraph">
                         <?php foreach ($paragraphs as $number => $paragraph): ?>
                             <div id="<?= $paragraph->chunk; ?>" data-entity-id="<?= $paragraph->id; ?>"
-                                class="<?= $fragment == $paragraph->chunk ? "card border-primary" : "" ?>">
+                                class="<?= $fragment == $paragraph->chunk ? "card border-secondary" : "" ?>">
                                 <div class="card-body">
 
                                     <div class="paragraph-text">
