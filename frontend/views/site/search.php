@@ -119,6 +119,7 @@ echo Html::endForm();
                         'site/context',
                         'id' => $paragraph->id,
                         'page' => $total,
+                        'f' => $paragraph->chunk,
                         '#' => $paragraph->chunk // Используем только якорь
                       ],
                       [
