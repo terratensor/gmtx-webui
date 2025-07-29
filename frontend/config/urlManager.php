@@ -19,6 +19,7 @@ return [
         'join/confirm' => 'auth/join/confirm',
         'search' => 'site/search',
         '<_a:login|logout>' => 'auth/auth/<_a>',
+        'library/context' => 'site/context',
 
         '<_c:[\w\-]+>' => '<_c>/index',
         '<_c:[\w\-]+>/<id:\d+>' => '<_c>/view',

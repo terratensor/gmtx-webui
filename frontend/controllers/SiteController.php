@@ -11,12 +11,14 @@ use yii\filters\AccessControl;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use src\Search\forms\SearchForm;
+use yii\web\NotFoundHttpException;
 use frontend\models\VerifyEmailForm;
 use yii\web\BadRequestHttpException;
 use frontend\models\ResetPasswordForm;
 use yii\base\InvalidArgumentException;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
+use src\Library\manticore\services\ContextService;
 use src\Library\manticore\services\ManticoreService;
 use src\Search\Http\Action\V1\SearchSettings\ToggleAction;
 use src\Library\manticore\services\EmptySearchRequestExceptions;
@@ -28,15 +30,18 @@ class SiteController extends Controller
 {
 
     private ManticoreService $service;
+    private ContextService $contextService;
 
     public function __construct(
         $id,
         $module,
         ManticoreService $service,
+        ContextService $contextService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->contextService = $contextService;
     }
 
     /**
@@ -156,5 +161,31 @@ class SiteController extends Controller
             'model' => $form,
             'errorQueryMessage' => $errorQueryMessage,
         ]);
+    }
+
+    public function actionContext($id): string
+    {
+        $this->layout = 'print';
+        $errorQueryMessage = 'The requested page does not exist.';
+
+        try {
+
+            $quoteResults = $this->contextService->handle($id);
+            $results = $this->service->search($quoteResults->searchForm);
+
+            // var_dump($quoteResults->bookName); die();
+
+            return $this->render('context', [
+                'results' => $results,
+                'bookName' => $quoteResults->bookName,
+            ]);
+        } catch (\DomainException $e) {
+            Yii::$app->errorHandler->logException($e);
+            Yii::$app->session->setFlash('error', $e->getMessage());
+        } catch (EmptySearchRequestExceptions $e) {
+            $errorQueryMessage = $e->getMessage();
+        }
+
+        throw new NotFoundHttpException($errorQueryMessage);
     }
 }
