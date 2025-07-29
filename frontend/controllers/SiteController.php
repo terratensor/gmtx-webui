@@ -52,7 +52,7 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['search'], // Указываем, к каким действиям применяем контроль
+                'only' => ['search', 'context'], // Указываем, к каким действиям применяем контроль
                 'rules' => [
                     [
                         'actions' => ['search', 'context'],
