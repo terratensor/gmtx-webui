@@ -68,6 +68,7 @@ echo Html::endForm();
                 [
                     'totalCount' => $results->getTotalCount(),
                     'defaultPageSize' => Yii::$app->params['searchResults']['pageSize'],
+                    'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
                 ]
             );
             ?>
