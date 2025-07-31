@@ -139,6 +139,7 @@ class SiteController extends Controller
         $errorQueryMessage = '';
 
         // $aggs = $this->service->aggs($form);
+        // $results = $this->service->facets($form);
 
 
         try {

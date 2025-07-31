@@ -131,7 +131,7 @@ echo Html::endForm();
                 </div>
                 <div class="card-body">
                   <div class="py-xl-5 py-3 px-xl-5 px-lg-5 px-md-5 px-sm-3 paragraph" data-entity-id="<?= $paragraph->id; ?>">
-                    <!-- <h5><?php SearchResultHelper::highlightFieldContent($paragraph, 'title'); ?></h4> -->
+                    <?php SearchResultHelper::highlightFieldContent($paragraph, 'title'); ?>
                     <div class=" paragraph-text">
                       <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', $model->singleLineMode); ?>
                     </div>

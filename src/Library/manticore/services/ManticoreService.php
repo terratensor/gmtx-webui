@@ -21,26 +21,54 @@ class ManticoreService
     /**
      * @param SearchForm $form
      * @return ParagraphDataProvider
-     * @throws EmptySearchRequestExceptions
      */
     public function search(SearchForm $form): ParagraphDataProvider
     {
-        $queryString = $form->query;
-
-        $comments = match ($form->matching) {
-            'query_string' => $this->paragraphRepository->findByQueryStringNew($queryString, $form),
-            'match_phrase' => $this->paragraphRepository->findByMatchPhrase($queryString, $form),
-            'match' => $this->paragraphRepository->findByQueryStringMatch($queryString,  $form),
-            'context' => $this->paragraphRepository->findByContext($form, $indexName ?? null),
+        $results = match ($form->matching) {
+            'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
+            'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
+            'match' => $this->paragraphRepository->findByQueryStringMatch($form),
+            'context' => $this->paragraphRepository->findByContext($form),
         };
 
 
-        $responseData = $comments->get()->getResponse()->getResponse();
+        $responseData = $results->get()->getResponse()->getResponse();
         // Определяем параметры пагинации
         $pagination = $form->matching === 'context' ? [
             'pageSize' => Yii::$app->params['context']['pageSize'],
             'pageSizeLimit' => Yii::$app->params['context']['pageSizeLimit'],
         ] : [
+            'pageSize' => Yii::$app->params['searchResults']['pageSize'],
+            'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
+        ];
+        return new ParagraphDataProvider(
+            [
+                'query' => $results,
+                'pagination' => $pagination,
+                'sort' => [
+                    'defaultOrder' => [
+                        '_score' => SORT_DESC,
+                        'chunk' => SORT_ASC,
+                        'id' => SORT_ASC,
+                    ],
+                    'attributes' => [
+                        '_score',
+                        'chunk',
+                        'id',
+                    ]
+                ],
+                'responseData' => $responseData
+            ]
+        );
+    }
+
+    public function facets()
+    {
+        $comments = $this->paragraphRepository->findFacets();
+
+        $responseData = $comments->get()->getResponse()->getResponse();
+        // Определяем параметры пагинации
+        $pagination = [
             'pageSize' => Yii::$app->params['searchResults']['pageSize'],
             'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
         ];
