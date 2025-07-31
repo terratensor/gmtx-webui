@@ -8,6 +8,7 @@ use frontend\widgets\ScrollWidget;
 use src\Search\helpers\SearchResultHelper;
 use src\Library\manticore\models\Paragraph;
 use src\Library\manticore\repositories\ParagraphDataProvider;
+
 ini_set('memory_limit', '256M'); // или больше, если нужно
 
 /** @var yii\web\View $this */
@@ -66,7 +67,7 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
                 class="<?= $fragment == $paragraph->chunk ? "card border-secondary" : "" ?>">
                 <div class="card-body">
 
-                  <div class="paragraph-text">                    
+                  <div class="paragraph-text">
                     <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', false); ?>
                   </div>
                 </div>
@@ -78,8 +79,8 @@ $fragment = Yii::$app->request->get()['f'] ?? 0;
           </div>
         </div>
       </div>
-      <div class="progress mb-3 d-print-none sticky-bottom">
-        <div class="progress-bar bg-danger" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="progress mb-3 d-print-none sticky-bottom mb-2" style="height: 8px;">
+        <div class="progress-bar bg-progress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <div class="container container-pagination d-print-none">
         <div class="detachable">
