@@ -696,3 +696,8 @@ input:focus:-ms-input-placeholder {
     background-color: rgba(0, 123, 255, 0.05);
     transition: background-color 0.3s ease;
 }
+
+.bg-progress {
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-secondary-color-rgb), 0.5) !important
+}
