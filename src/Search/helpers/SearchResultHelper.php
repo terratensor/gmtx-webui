@@ -24,10 +24,15 @@ class SearchResultHelper
         $highlightedText = $highlight[0] ?? $paragraph->{$field};
 
         if ($type === 'markdown') {
+            // Сначала очистим текст от потенциально опасного содержимого
+            $highlightedText = self::sanitizeText($highlightedText);
+
             $processed = Markdown::process($highlightedText);
 
+            // Исправим возможные проблемы с HTML-тегами
+            $processed = self::fixHtmlTags($processed);
+
             if ($singleLine) {
-                // Сохраняем теги <mark> при удалении переносов строк
                 $processed = self::convertToSingleLine($processed);
             }
 
@@ -35,8 +40,70 @@ class SearchResultHelper
         }
 
         return TextProcessor::widget([
-            'text' => $highlightedText,
+            'text' => self::sanitizeText($highlightedText),
         ]);
+    }
+
+    /**
+     * Fixes unclosed or malformed HTML tags
+     * @param string $html
+     * @return string
+     */
+    protected static function fixHtmlTags(string $html): string
+    {
+        // 1. Создаем конфигурацию
+        $config = \HTMLPurifier_Config::createDefault();
+
+        // 2. Настраиваем все параметры ДО финализации конфига
+        $config->set('HTML.Allowed', 'p,ol,ul,li,strong,em,a[href],br,mark');
+        $config->set('Cache.DefinitionImpl', null);
+
+        $cachePath = Yii::getAlias('@runtime/htmlpurifier');
+        if (!file_exists($cachePath)) {
+            @mkdir($cachePath, 0777, true);
+        }
+        $config->set('Cache.SerializerPath', $cachePath);
+
+        // 3. Добавляем кастомные определения
+        $config->set('HTML.DefinitionID', 'custom-html-def');
+        $config->set('HTML.DefinitionRev', 1);
+
+        // 4. Получаем определение ДО создания экземпляра HTMLPurifier
+        if ($def = $config->maybeGetRawHTMLDefinition()) {
+            $def->addElement('mark', 'Inline', 'Inline', 'Common', array(
+                'class' => 'Optional',
+            ));
+        }
+
+        // 5. Создаем экземпляр HTMLPurifier
+        try {
+            $purifier = new \HTMLPurifier($config);
+            return $purifier->purify($html);
+        } catch (\Exception $e) {
+            Yii::error('HTMLPurifier error: ' . $e->getMessage());
+            return strip_tags($html, '<p><ol><ul><li><mark><strong><em><a><br>');
+        }
+    }
+
+    /**
+     * Sanitizes text by removing harmful content
+     * @param string $text
+     * @return string
+     */
+    protected static function sanitizeText(string $text): string
+    {
+        // Удаляем HTML комментарии
+        $text = preg_replace('/<!--.*?-->/s', '', $text);
+
+        // Удаляем "зеркальные" комментарии HTTrack
+        $text = preg_replace('/<!-- Mirrored from.*?-->/is', '', $text);
+
+        // Удаляем другие потенциально опасные конструкции
+        $text = preg_replace('/<\?.*?\?>/s', '', $text);
+        $text = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $text);
+        $text = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $text);
+
+        return $text;
     }
 
     /**
@@ -62,8 +129,6 @@ class SearchResultHelper
     {
         return $paragraph->{$field};
     }
-
-    // src/helpers/SearchHelper.php
 
     public static function getResetFiltersUrl(): array
     {
