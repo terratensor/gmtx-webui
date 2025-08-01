@@ -57,4 +57,9 @@ class SearchForm extends Model
 
         return parent::beforeValidate();
     }
+
+    public function isEmpty(): bool
+    {
+        return ($this->query === '' && ($this->genre === '' && $this->author === '' & $this->title === ''));
+    }
 }

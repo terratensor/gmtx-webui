@@ -139,13 +139,18 @@ class SiteController extends Controller
         $errorQueryMessage = '';
 
         // $aggs = $this->service->aggs($form);
-        // $results = $this->service->facets($form);
+        if ($form->isEmpty()) {
+            // $results = $this->service->facets();
+        }
 
 
         try {
             if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
-
-                $results = $this->service->search($form);
+                // var_dump($form->isEmpty());
+                if (!$form->isEmpty()) {
+                    // $results = $this->service->facets();
+                    $results = $this->service->search($form);
+                } 
             }
         } catch (\DomainException $e) {
             Yii::$app->errorHandler->logException($e);
