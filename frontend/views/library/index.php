@@ -34,7 +34,7 @@ echo Html::endForm();
         <div class="accordion-item">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#genreCollapse">
-              <i class="bi bi-bookmark me-2"></i> Жанры <span class="badge bg-danger"><?= number_format($results['genres']['count'], 0, '', ' ') ?></span>
+              <i class="bi bi-bookmark me-2"></i> Жанры <span class="badge bg-secondary"><?= number_format($results['genres']['count'], 0, '', ' ') ?></span>
             </button>
           </h2>
           <div id="genreCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
@@ -86,12 +86,11 @@ echo Html::endForm();
             </div>
           </div>
         </div>
-                        <?php //var_dump($results['authors']); die(); ?>
         <!-- Авторы -->
         <div class="accordion-item" id="authorAccordion">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
-              <i class="bi bi-person me-2"></i> Авторы <span class="badge bg-danger author-badge"><?= number_format($results['authors']['count'], 0, '', ' ') ?></span>
+              <i class="bi bi-person me-2"></i> Авторы <span class="badge bg-secondary author-badge"><?= number_format($results['authors']['count'], 0, '', ' ') ?></span>
             </button>
           </h2>
           <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
@@ -100,7 +99,6 @@ echo Html::endForm();
                 <input type="text" class="form-control form-control-sm" placeholder="Начните вводить имя для поиска...">
               </div>
               <ul class="facet-list">
-                <?php //var_dump($results['authors']['data']['author_group']['buckets']); die(); ?>
                 <?php foreach ($results['authors']['data']['author_group']['buckets'] as $author): ?>
                   <?php if (!empty($author['key'])): ?>
                     <li>
@@ -123,6 +121,34 @@ echo Html::endForm();
           </div>
         </div>
 
+        <!-- Названия -->
+        <div class="accordion-item" id="titleAccordion">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#titleCollapse">
+              <i class="bi bi-card-text me-2"></i> Названия <span class="badge bg-secondary title-badge">
+                <?= number_format($results['titles']['count'], 0, '', ' ') ?></span>
+            </button>
+          </h2>
+          <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+            <div class="accordion-body p-0">
+              <div class="facet-search mb-2 px-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
+              </div>
+              <ul class="facet-list">
+                <?php foreach ($results['titles']['data']['title_group']['buckets'] as $title): ?>
+                  <?php if (!empty($title['key'])): ?>
+                    <li>
+                      <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
+                        <?= Html::encode($title['key']) ?>
+                        <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
+                      </a>
+                    </li>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          </div>
+        </div>
 
       </div>
     <?php endif; ?>

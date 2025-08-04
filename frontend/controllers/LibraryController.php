@@ -15,14 +15,15 @@ use src\Library\manticore\services\ContextService;
 use src\Library\manticore\services\ManticoreService;
 use src\Search\Http\Action\V1\SearchSettings\ToggleAction;
 use src\Library\manticore\services\EmptySearchRequestExceptions;
+use src\Library\manticore\services\TitleService;
 use yii\web\Response;
 
 class LibraryController extends Controller
 {
     private ManticoreService $service;
     private ContextService $contextService;
-
     private AuthorService $authorService;
+    private TitleService $titleService;
 
     public function __construct(
         $id,
@@ -30,12 +31,14 @@ class LibraryController extends Controller
         ManticoreService $service,
         ContextService $contextService,
         AuthorService $authorService,
+        TitleService $titleService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
         $this->service = $service;
         $this->contextService = $contextService;
         $this->authorService = $authorService;
+        $this->titleService = $titleService;
     }
 
     /**
@@ -131,7 +134,13 @@ class LibraryController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $result = $this->authorService->findAuthor($q);
+        return $result;
+    }
 
+    public function actionTitle($q)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $result = $this->titleService->findTitle($q);
         return $result;
     }
 }

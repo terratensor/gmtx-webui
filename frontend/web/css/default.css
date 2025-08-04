@@ -620,7 +620,8 @@ input:focus:-ms-input-placeholder {
 }
 
 .genre-item span.badge.bg-secondary,
-.facet-list span.badge.bg-secondary {
+.facet-list span.badge.bg-secondary,
+.accordion-header span.badge.bg-secondary {
     color: var(--bs-badge-filter-color);
 }
 
@@ -684,7 +685,8 @@ input:focus:-ms-input-placeholder {
 
 /* Контекст */
 [id] {
-    scroll-margin-top: 20px; /* Компенсация для фиксированного header'а */
+    scroll-margin-top: 20px;
+    /* Компенсация для фиксированного header'а */
     transition: background-color 0.3s ease;
 }
 
@@ -710,6 +712,6 @@ input:focus:-ms-input-placeholder {
 }
 
 /* Включаем взаимодействие с дочерними элементами */
-.search-block > * {
+.search-block>* {
     pointer-events: auto;
 }

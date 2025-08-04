@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace src\Library\manticore\services;
 
 use src\Library\manticore\repositories\AuthorRepository;
+use src\Library\manticore\repositories\TitleRepository;
 use Yii;
 use src\Search\forms\SearchForm;
 use src\Library\manticore\repositories\ParagraphRepository;
@@ -16,11 +17,16 @@ class ManticoreService
 {
     private ParagraphRepository $paragraphRepository;
     private AuthorRepository $authorRepository;
+    private TitleRepository $titleRepository;
 
-    public function __construct(ParagraphRepository $questionRepository, AuthorRepository $authorRepository)
-    {
+    public function __construct(
+        ParagraphRepository $questionRepository,
+        AuthorRepository $authorRepository,
+        TitleRepository $titleRepository
+    ) {
         $this->paragraphRepository = $questionRepository;
         $this->authorRepository = $authorRepository;
+        $this->titleRepository = $titleRepository;
     }
 
     /**
@@ -72,6 +78,7 @@ class ManticoreService
         $facets = [];
         $facets['genres'] = $this->paragraphRepository->findGenreFacets();
         $facets['authors'] = $this->authorRepository->findFacetsByName('');
+        $facets['titles'] = $this->titleRepository->findFacetsByName('');
         // var_dump($facets['authors']);
         return $facets;
     }

@@ -254,150 +254,233 @@ $aggs = $this->params['aggs'] ?? [];
             });
         });
 
-// Добавьте этот код перед основным скриптом поиска авторов
-const SearchHelper = {
-    EMPTY_GENRE: "Не установлен",
-    EMPTY_AUTHOR: "Не установлен"
-};
+        // Добавьте этот код перед основным скриптом поиска авторов
+        const SearchHelper = {
+            EMPTY_GENRE: "Не установлен",
+            EMPTY_AUTHOR: "Не установлен"
+        };
 
-class UrlHelper {
-    static addSearchParam(paramName, paramValue, route = 'library/search') {
-        // Получаем базовый URL
-        const baseUrl = new URL(window.location.origin);
-        
-        // Создаем новый URL с указанным route
-        const newUrl = new URL(route, baseUrl);
-        const searchParams = new URLSearchParams();
-        
-        // Копируем все существующие параметры, кроме search
-        const currentParams = new URLSearchParams(window.location.search);
-        currentParams.forEach((value, key) => {
-            if (!key.startsWith('search[')) {
-                searchParams.set(key, value);
-            }
-        });
-        
-        // Собираем параметры search
-        const search = {};
-        
-        // Добавляем существующие search параметры
-        currentParams.forEach((value, key) => {
-            if (key.startsWith('search[') && key.endsWith(']')) {
-                const param = key.match(/search\[(.*?)\]/)[1];
-                search[param] = value;
-            }
-        });
-        
-        // Обновляем нужный параметр
-        if (paramValue && paramValue !== SearchHelper.EMPTY_AUTHOR) {
-            search[paramName] = paramValue;
-        } else {
-            delete search[paramName];
-        }
-        
-        // Добавляем обновленные search параметры
-        for (const [key, value] of Object.entries(search)) {
-            if (value !== undefined && value !== null && value !== '') {
-                searchParams.set(`search[${key}]`, value);
-            }
-        }
-        
-        // Устанавливаем параметры в URL
-        newUrl.search = searchParams.toString();
-        
-        return newUrl.toString();
-    }
-}
+        class UrlHelper {
+            static addSearchParam(paramName, paramValue, route = 'library/search') {
+                // Получаем базовый URL
+                const baseUrl = new URL(window.location.origin);
 
-// Затем можно добавить предыдущий скрипт поиска авторов
+                // Создаем новый URL с указанным route
+                const newUrl = new URL(route, baseUrl);
+                const searchParams = new URLSearchParams();
 
-    // Элементы поиска авторов
-    const authorSearchInput = document.querySelector('#authorCollapse .facet-search input');
-    const authorList = document.querySelector('#authorCollapse .facet-list');
-    const authorBadge = document.querySelector('#authorAccordion .accordion-header .badge.bg-danger');
-    
-    if (authorSearchInput && authorList && authorBadge) {
-        // Сохраняем оригинальный список авторов и счетчик
-        const originalAuthors = authorList.innerHTML;
-        const originalCount = authorBadge.textContent.trim();
-        
-        // Таймер для задержки запроса
-        let searchTimer;
-        
-        // Обработчик ввода текста
-        authorSearchInput.addEventListener('input', function() {
-            clearTimeout(searchTimer);
-            const searchText = this.value.trim();
-            
-            // Если поле пустое, показываем исходный список
-            if (searchText === '') {
-                resetAuthorList();
-                return;
-            }
-            
-            // Задержка перед отправкой запроса (300 мс)
-            searchTimer = setTimeout(() => {
-                searchAuthors(searchText);
-            }, 300);
-        });
-        
-        // Функция поиска авторов
-        function searchAuthors(query) {
-            fetch(`/library/author?q=${encodeURIComponent(query)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    updateAuthorList(data.authors);
-                })
-                .catch(error => {
-                    console.error('Ошибка при поиске авторов:', error);
-                    resetAuthorList();
+                // Копируем все существующие параметры, кроме search
+                const currentParams = new URLSearchParams(window.location.search);
+                currentParams.forEach((value, key) => {
+                    if (!key.startsWith('search[')) {
+                        searchParams.set(key, value);
+                    }
                 });
+
+                // Собираем параметры search
+                const search = {};
+
+                // Добавляем существующие search параметры
+                currentParams.forEach((value, key) => {
+                    if (key.startsWith('search[') && key.endsWith(']')) {
+                        const param = key.match(/search\[(.*?)\]/)[1];
+                        search[param] = value;
+                    }
+                });
+
+                // Обновляем нужный параметр
+                if (paramValue && paramValue !== SearchHelper.EMPTY_AUTHOR) {
+                    search[paramName] = paramValue;
+                } else {
+                    delete search[paramName];
+                }
+
+                // Добавляем обновленные search параметры
+                for (const [key, value] of Object.entries(search)) {
+                    if (value !== undefined && value !== null && value !== '') {
+                        searchParams.set(`search[${key}]`, value);
+                    }
+                }
+
+                // Устанавливаем параметры в URL
+                newUrl.search = searchParams.toString();
+
+                return newUrl.toString();
+            }
         }
-        
-        // Функция обновления списка авторов и счетчика
-        function updateAuthorList(authorsData) {
-            // Обновляем счетчик
-            authorBadge.textContent = formatNumber(authorsData.count);
-            
-            // Обновляем список
-            authorList.innerHTML = '';
-            
-            authorsData.data.author_group.buckets.forEach(author => {
-                const li = document.createElement('li');
-                const key = author.key || SearchHelper.EMPTY_AUTHOR;
-                
-                li.innerHTML = `
+
+        // Затем можно добавить предыдущий скрипт поиска авторов
+
+        // Элементы поиска авторов
+        const authorSearchInput = document.querySelector('#authorCollapse .facet-search input');
+        const authorList = document.querySelector('#authorCollapse .facet-list');
+        const authorBadge = document.querySelector('#authorAccordion .accordion-header .badge.bg-secondary');
+
+        if (authorSearchInput && authorList && authorBadge) {
+            // Сохраняем оригинальный список авторов и счетчик
+            const originalAuthors = authorList.innerHTML;
+            const originalCount = authorBadge.textContent.trim();
+
+            // Таймер для задержки запроса
+            let searchTimer;
+
+            // Обработчик ввода текста
+            authorSearchInput.addEventListener('input', function() {
+                clearTimeout(searchTimer);
+                const searchText = this.value.trim();
+
+                // Если поле пустое, показываем исходный список
+                if (searchText === '') {
+                    resetAuthorList();
+                    return;
+                }
+
+                // Задержка перед отправкой запроса (300 мс)
+                searchTimer = setTimeout(() => {
+                    searchAuthors(searchText);
+                }, 300);
+            });
+
+            // Функция поиска авторов
+            function searchAuthors(query) {
+                fetch(`/library/author?q=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        updateAuthorList(data.authors);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при поиске авторов:', error);
+                        resetAuthorList();
+                    });
+            }
+
+            // Функция обновления списка авторов и счетчика
+            function updateAuthorList(authorsData) {
+                // Обновляем счетчик
+                authorBadge.textContent = formatNumber(authorsData.count);
+
+                // Обновляем список
+                authorList.innerHTML = '';
+
+                authorsData.data.author_group.buckets.forEach(author => {
+                    const li = document.createElement('li');
+                    const key = author.key || SearchHelper.EMPTY_AUTHOR;
+
+                    li.innerHTML = `
                     <a href="${UrlHelper.addSearchParam('author', key)}">
                         ${escapeHtml(key)}
                         <span class="badge bg-secondary float-end">${formatNumber(author.doc_count)}</span>
                     </a>
                 `;
-                
-                authorList.appendChild(li);
-            });
-        }
-        
-        // Функция сброса к исходному состоянию
-        function resetAuthorList() {
-            authorBadge.textContent = originalCount;
-            authorList.innerHTML = originalAuthors;
-        }
-        
-        // Вспомогательные функции
-        function escapeHtml(unsafe) {
-            const div = document.createElement('div');
-            div.textContent = unsafe;
-            return div.innerHTML;
-        }
-        
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-        }
-    }
 
+                    authorList.appendChild(li);
+                });
+            }
+
+            // Функция сброса к исходному состоянию
+            function resetAuthorList() {
+                authorBadge.textContent = originalCount;
+                authorList.innerHTML = originalAuthors;
+            }
+
+            // Вспомогательные функции
+            function escapeHtml(unsafe) {
+                const div = document.createElement('div');
+                div.textContent = unsafe;
+                return div.innerHTML;
+            }
+
+            function formatNumber(num) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+            }
+        }
+
+        // Код для поиска по названиям книг
+        const titleSearchInput = document.querySelector('#titleCollapse .facet-search input');
+        const titleList = document.querySelector('#titleCollapse .facet-list');
+        const titleBadge = document.querySelector('#titleAccordion .accordion-header .badge.bg-secondary');
+
+        if (titleSearchInput && titleList && titleBadge) {
+            // Сохраняем оригинальный список названий и счетчик
+            const originalTitles = titleList.innerHTML;
+            const originalCount = titleBadge.textContent.trim();
+
+            // Таймер для задержки запроса
+            let searchTimer;
+
+            // Обработчик ввода текста
+            titleSearchInput.addEventListener('input', function() {
+                clearTimeout(searchTimer);
+                const searchText = this.value.trim();
+
+                // Если поле пустое, показываем исходный список
+                if (searchText === '') {
+                    resetTitleList();
+                    return;
+                }
+
+                // Задержка перед отправкой запроса (300 мс)
+                searchTimer = setTimeout(() => {
+                    searchTitles(searchText);
+                }, 500);
+            });
+
+            // Функция поиска названий
+            function searchTitles(query) {
+                fetch(`/library/title?q=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        updateTitleList(data.titles);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при поиске названий:', error);
+                        resetTitleList();
+                    });
+            }
+
+            // Функция обновления списка названий и счетчика
+            function updateTitleList(titlesData) {
+                // Обновляем счетчик
+                titleBadge.textContent = formatNumber(titlesData.count);
+
+                // Обновляем список
+                titleList.innerHTML = '';
+
+                titlesData.data.title_group.buckets.forEach(title => {
+                    // Пропускаем пустые названия
+                    if (!title.key) return;
+
+                    const li = document.createElement('li');
+                    const key = title.key;
+
+                    // Обрезаем длинные названия до 30 символов
+                    const displayText = key.length > 255 ?
+                        key.substring(0, 255) + '...' :
+                        key;
+
+                    li.innerHTML = `
+                <a href="${UrlHelper.addSearchParam('title', key)}">
+                    ${escapeHtml(displayText)}
+                    <span class="badge bg-secondary float-end">${formatNumber(title.doc_count)}</span>
+                </a>
+            `;
+
+                    titleList.appendChild(li);
+                });
+            }
+
+            // Функция сброса к исходному состоянию
+            function resetTitleList() {
+                titleBadge.textContent = originalCount;
+                titleList.innerHTML = originalTitles;
+            }
+        }
 
     });
 </script>
