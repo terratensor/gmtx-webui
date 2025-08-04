@@ -39,10 +39,10 @@ class TitleRepository
             function () use ($value) {
                 $result = [];
                 // Получаем количество категорий из таблицы categories
-                if ($value == '' && strlen($value) < 2) {
+                if ($value == '') {
                     $query_count = "SELECT COUNT(*) FROM titles";
                 } else {
-                    $query_count = "SELECT COUNT(*) FROM titles WHERE MATCH('@title ^$value*')";
+                    $query_count = "SELECT COUNT(*) FROM titles WHERE MATCH('@title $value')";
                 }
                 $response = $this->client->sql($query_count, true);
                 $limit = $response[0] ?? 100;
@@ -51,7 +51,7 @@ class TitleRepository
                 if ($value !== '') {
                     $value = "@title $value";
                 }
-                $this->search->search("$value");
+                $this->search->search($value);
                 $this->search->setSource(['id', 'name']);
                 $this->search->facet('title', 'title_group', 100, 'count(*)', 'desc');
                 $this->search->limit(0);

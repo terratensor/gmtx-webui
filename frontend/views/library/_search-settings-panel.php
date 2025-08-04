@@ -21,12 +21,13 @@ if ($total_count) {
 <div id="search-setting-panel"
   class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
   <div class="sidebar">
+    <!--
     <div class="sidebar-header d-flex justify-content-between">
       <div>
         <?= $summary ?>
       </div>
       <button type="button" id="close-search-settings" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
+    </div> -->
 
     <div class="sidebar-content">
       <?= $form->field($model, 'matching', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])

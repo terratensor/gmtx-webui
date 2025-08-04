@@ -48,17 +48,21 @@ class AuthorRepository
             function () use ($value) {
                 $result = [];
                 // Получаем количество категорий из таблицы categories
-                if ($value == '' && strlen($value) < 2) {
+                if ($value == '') {
                     $query_count = "SELECT COUNT(*) FROM authors";
                 } else {
-                    $query_count = "SELECT COUNT(*) FROM authors WHERE MATCH('@name ^$value*')";
+                    $query_count = "SELECT COUNT(*) FROM authors WHERE MATCH('@name $value')";
                 }
                 $response = $this->client->sql($query_count, true);
                 $limit = $response[0] ?? 100;
 
                 $result['count'] = $limit;
 
-                $this->search->search("@author ^$value*");
+                $result['count'] = $limit;
+                if ($value !== '') {
+                    $value = "@author $value";
+                }
+                $this->search->search($value);
                 $this->search->setSource(['id', 'name']);
                 $this->search->facet('author', 'author_group', 100, 'count(*)', 'desc');
                 $this->search->limit(0);

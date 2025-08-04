@@ -319,6 +319,10 @@ html[data-bs-theme="light"] {
     background-color: var(--sr-bg-color);
 }
 
+.start-searching {
+    margin-top: 0;
+}
+
 span.link {
     color: #ad3434;
     hover-color: #222222;
@@ -570,7 +574,7 @@ input:focus:-ms-input-placeholder {
 
 /* фасет жанры в строку */
 .search-setting-panel .sidebar-content {
-    padding: 1rem 0.2rem;
+    padding: 0 0.2rem;
 }
 
 /* Общие стили для контейнеров с прокруткой */
@@ -707,7 +711,7 @@ input:focus:-ms-input-placeholder {
     transition: transform 0.3s ease;
     z-index: 1020;
     background-color: var(--bs-body-bg);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     transform: translateY(0);
 }
 
