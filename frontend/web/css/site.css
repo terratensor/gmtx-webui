@@ -209,18 +209,6 @@ p.summary {
     margin: 1rem 0;
 }
 
-.search-block {
-    /* position: sticky; */
-    top: 55px;
-    background: white;
-    z-index: 100;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.search-block.fixed {
-    position: fixed;
-}
-
 label.small-text {
     font-size: 14px;
     color: rgba(33, 37, 41, 0.75);
