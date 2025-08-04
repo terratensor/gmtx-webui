@@ -361,10 +361,6 @@ span.link {
     background-color: var(--svodd-breadcrumb);
 }
 
-.search-block {
-    background-color: var(--bs-body-bg);
-}
-
 .form-control {
     color: var(--sv-search-form);
     background-color: var(--sv-search-form-bg);
@@ -700,4 +696,20 @@ input:focus:-ms-input-placeholder {
 .bg-progress {
     --bs-bg-opacity: 1;
     background-color: rgba(var(--bs-secondary-color-rgb), 0.5) !important
+}
+
+/** Панель поиска */
+.search-block {
+    /* position: sticky; */
+    top: 0;
+    transition: transform 0.3s ease;
+    z-index: 1020;
+    background-color: var(--bs-body-bg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+}
+
+/* Включаем взаимодействие с дочерними элементами */
+.search-block > * {
+    pointer-events: auto;
 }
