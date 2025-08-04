@@ -12,475 +12,171 @@ use src\Search\helpers\SearchHelper;
 $aggs = $this->params['aggs'] ?? [];
 ?>
 <div id="search-setting-panel"
-    class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
-    <div class="sidebar">
-        <div class="sidebar-header d-flex justify-content-between">
-            <div>
-                <small>Найдено записей: <b><?= number_format($aggs['hits']['total'] ?? 0, 0, '', ' ') ?></b></small>
-            </div>
-            <button type="button" id="close-search-settings" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-
-        <div class="sidebar-content">
-            <?= $form->field($model, 'matching', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])
-                ->radioList($model->getMatching(), ['class' => 'form-check-inline'])
-                ->label(false); ?>
-            <!-- Чекбокс для включения/выключения нечёткого поиска -->
-            <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
-                ->checkbox()
-                ->label('Нечёткий поиск'); ?>
-            <!-- Чекбокс для включения/выключения однострочного режима -->
-            <?= $form->field($model, 'singleLineMode', [
-                'options' => ['class' => 'single-line-mode'],
-                'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
-                'labelOptions' => ['class' => 'form-check-label'],
-            ])->checkbox([
-                'class' => 'form-check-input',
-                'id' => 'single-line-mode',
-                'uncheck' => null,
-                'data-scroll' => 'true',
-            ], false)->label('Однострочный режим (убрать переносы строк)');
-            ?>
-            <!-- Чекбокс для переключения вида жанров -->
-            <?= $form->field($model, 'genreInlineView', [
-                'options' => ['class' => 'pb-2 genre-inline-view'],
-                'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
-                'labelOptions' => ['class' => 'form-check-label'],
-            ])->checkbox([
-                'class' => 'form-check-input',
-                'id' => 'genre-inline-view',
-                'uncheck' => null,
-            ], false)->label('Компактный вид жанров (компактный вид фильтров?)');
-            ?>
-            <?php if (!empty($aggs)) : ?>
-                <div class="accordion" id="filtersAccordion">
-                    <!-- Жанры -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#genreCollapse">
-                                <i class="bi bi-bookmark me-2"></i> Жанры
-                            </button>
-                        </h2>
-                        <div id="genreCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
-                            <div class="accordion-body p-0">
-                                <div class="facet-search mb-2 px-2">
-                                    <input type="text" class="form-control form-control-sm genre-search-input" placeholder="Поиск жанров...">
-                                </div>
-                                <div class="genre-list-container">
-                                    <!-- Список жанров (по умолчанию) -->
-                                    <ul class="facet-list genre-list-vertical scrollable-container">
-                                        <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
-                                            <?php if (!empty($genre['key'])): ?>
-                                                <li class="genre-item">
-                                                    <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>">
-                                                        <?= Html::encode($genre['key']) ?>
-                                                        <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
-                                                    </a>
-                                                </li>
-                                            <?php else: ?>
-                                                <li class="genre-item">
-                                                    <a href="<?= UrlHelper::addSearchParam('genre', SearchHelper::EMPTY_GENRE) ?>">
-                                                        <?= Html::encode(SearchHelper::EMPTY_GENRE) ?>
-                                                        <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
-                                                    </a>
-                                                </li>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                    <!-- Компактный вид жанров (скрыт по умолчанию) -->
-                                    <div class="genre-list-horizontal d-none scrollable-container">
-                                        <div class="genre-tags-container">
-                                            <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
-                                                <?php if (!empty($genre['key'])): ?>
-                                                    <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>" class="genre-tag genre-item">
-                                                        <?= Html::encode($genre['key']) ?>
-                                                        <span class="badge bg-secondary"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
-                                                    </a>
-                                                <?php else: ?>
-                                                    <a href="<?= UrlHelper::addSearchParam('genre', SearchHelper::EMPTY_GENRE) ?>" class="genre-tag genre-item">
-                                                        <?= Html::encode(SearchHelper::EMPTY_GENRE) ?>
-                                                        <span class="badge bg-secondary"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
-                                                    </a>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Остальные аккордеоны (авторы, названия) остаются без изменений -->
-                    <!-- Авторы -->
-                    <div class="accordion-item" id="authorAccordion">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
-                                <i class="bi bi-person me-2"></i> Авторы
-                            </button>
-                        </h2>
-                        <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
-                            <div class="accordion-body p-0">
-                                <div class="facet-search mb-2 px-2">
-                                    <input type="text" class="form-control form-control-sm" placeholder="Поиск авторов...">
-                                </div>
-                                <ul class="facet-list">
-                                    <?php foreach ($aggs['aggregations']['author_group']['buckets'] as $author): ?>
-                                        <?php if (!empty($author['key'])): ?>
-                                            <li>
-                                                <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
-                                                    <?= Html::encode($author['key']) ?>
-                                                    <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
-                                                </a>
-                                            </li>
-                                        <?php else: ?>
-                                            <li>
-                                                <a href="<?= UrlHelper::addSearchParam('author', SearchHelper::EMPTY_AUTHOR) ?>">
-                                                    <?= Html::encode(SearchHelper::EMPTY_AUTHOR) ?>
-                                                    <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
-                                                </a>
-                                            </li>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Названия -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#titleCollapse">
-                                <i class="bi bi-card-text me-2"></i> Названия
-                            </button>
-                        </h2>
-                        <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
-                            <div class="accordion-body p-0">
-                                <div class="facet-search mb-2 px-2">
-                                    <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
-                                </div>
-                                <ul class="facet-list">
-                                    <?php foreach ($aggs['aggregations']['title_group']['buckets'] as $title): ?>
-                                        <?php if (!empty($title['key'])): ?>
-                                            <li>
-                                                <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
-                                                    <?= Html::encode(mb_substr($title['key'], 0, 30) . (mb_strlen($title['key']) > 30 ? '...' : '')) ?>
-                                                    <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
-                                                </a>
-                                            </li>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-        </div>
+  class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
+  <div class="sidebar">
+    <div class="sidebar-header d-flex justify-content-between">
+      <div>
+        <small>Найдено записей: <b><?= number_format($aggs['hits']['total'] ?? 0, 0, '', ' ') ?></b></small>
+      </div>
+      <button type="button" id="close-search-settings" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
+
+    <div class="sidebar-content">
+      <?= $form->field($model, 'matching', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])
+        ->radioList($model->getMatching(), ['class' => 'form-check-inline'])
+        ->label(false); ?>
+      <!-- Чекбокс для включения/выключения нечёткого поиска -->
+      <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
+        ->checkbox()
+        ->label('Нечёткий поиск'); ?>
+      <!-- Чекбокс для включения/выключения однострочного режима -->
+      <?= $form->field($model, 'singleLineMode', [
+        'options' => ['class' => 'single-line-mode'],
+        'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
+        'labelOptions' => ['class' => 'form-check-label'],
+      ])->checkbox([
+        'class' => 'form-check-input',
+        'id' => 'single-line-mode',
+        'uncheck' => null,
+        'data-scroll' => 'true',
+      ], false)->label('Однострочный режим (убрать переносы строк)');
+      ?>
+      <!-- Чекбокс для переключения вида жанров -->
+      <?= $form->field($model, 'genreInlineView', [
+        'options' => ['class' => 'pb-2 genre-inline-view'],
+        'template' => "<div class=\"form-check form-switch\">\n{input}\n{label}\n</div>",
+        'labelOptions' => ['class' => 'form-check-label'],
+      ])->checkbox([
+        'class' => 'form-check-input',
+        'id' => 'genre-inline-view',
+        'uncheck' => null,
+      ], false)->label('Компактный вид жанров (компактный вид фильтров?)');
+      ?>
+      <?php if (!empty($aggs)) : ?>
+        <div class="accordion" id="filtersAccordion">
+          <!-- Жанры -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#genreCollapse">
+                <i class="bi bi-bookmark me-2"></i> Жанры
+              </button>
+            </h2>
+            <div id="genreCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+              <div class="accordion-body p-0">
+                <div class="facet-search mb-2 px-2">
+                  <input type="text" class="form-control form-control-sm genre-search-input" placeholder="Поиск жанров...">
+                </div>
+                <div class="genre-list-container">
+                  <!-- Список жанров (по умолчанию) -->
+                  <ul class="facet-list genre-list-vertical scrollable-container">
+                    <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
+                      <?php if (!empty($genre['key'])): ?>
+                        <li class="genre-item">
+                          <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>">
+                            <?= Html::encode($genre['key']) ?>
+                            <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                          </a>
+                        </li>
+                      <?php else: ?>
+                        <li class="genre-item">
+                          <a href="<?= UrlHelper::addSearchParam('genre', SearchHelper::EMPTY_GENRE) ?>">
+                            <?= Html::encode(SearchHelper::EMPTY_GENRE) ?>
+                            <span class="badge bg-secondary float-end"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                          </a>
+                        </li>
+                      <?php endif; ?>
+                    <?php endforeach; ?>
+                  </ul>
+                  <!-- Компактный вид жанров (скрыт по умолчанию) -->
+                  <div class="genre-list-horizontal d-none scrollable-container">
+                    <div class="genre-tags-container">
+                      <?php foreach ($aggs['aggregations']['genre_group']['buckets'] as $genre): ?>
+                        <?php if (!empty($genre['key'])): ?>
+                          <a href="<?= UrlHelper::addSearchParam('genre', $genre['key']) ?>" class="genre-tag genre-item">
+                            <?= Html::encode($genre['key']) ?>
+                            <span class="badge bg-secondary"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                          </a>
+                        <?php else: ?>
+                          <a href="<?= UrlHelper::addSearchParam('genre', SearchHelper::EMPTY_GENRE) ?>" class="genre-tag genre-item">
+                            <?= Html::encode(SearchHelper::EMPTY_GENRE) ?>
+                            <span class="badge bg-secondary"><?= number_format($genre['doc_count'], 0, '', ' ') ?></span>
+                          </a>
+                        <?php endif; ?>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Остальные аккордеоны (авторы, названия) остаются без изменений -->
+          <!-- Авторы -->
+          <div class="accordion-item" id="authorAccordion">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
+                <i class="bi bi-person me-2"></i> Авторы
+              </button>
+            </h2>
+            <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+              <div class="accordion-body p-0">
+                <div class="facet-search mb-2 px-2">
+                  <input type="text" class="form-control form-control-sm" placeholder="Поиск авторов...">
+                </div>
+                <ul class="facet-list">
+                  <?php foreach ($aggs['aggregations']['author_group']['buckets'] as $author): ?>
+                    <?php if (!empty($author['key'])): ?>
+                      <li>
+                        <a href="<?= UrlHelper::addSearchParam('author', $author['key']) ?>">
+                          <?= Html::encode($author['key']) ?>
+                          <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
+                        </a>
+                      </li>
+                    <?php else: ?>
+                      <li>
+                        <a href="<?= UrlHelper::addSearchParam('author', SearchHelper::EMPTY_AUTHOR) ?>">
+                          <?= Html::encode(SearchHelper::EMPTY_AUTHOR) ?>
+                          <span class="badge bg-secondary float-end"><?= number_format($author['doc_count'], 0, '', ' ') ?></span>
+                        </a>
+                      </li>
+                    <?php endif; ?>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Названия -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#titleCollapse">
+                <i class="bi bi-card-text me-2"></i> Названия
+              </button>
+            </h2>
+            <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
+              <div class="accordion-body p-0">
+                <div class="facet-search mb-2 px-2">
+                  <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
+                </div>
+                <ul class="facet-list">
+                  <?php foreach ($aggs['aggregations']['title_group']['buckets'] as $title): ?>
+                    <?php if (!empty($title['key'])): ?>
+                      <li>
+                        <a href="<?= UrlHelper::addSearchParam('title', $title['key']) ?>">
+                          <?= Html::encode(mb_substr($title['key'], 0, 30) . (mb_strlen($title['key']) > 30 ? '...' : '')) ?>
+                          <span class="badge bg-secondary float-end"><?= number_format($title['doc_count'], 0, '', ' ') ?></span>
+                        </a>
+                      </li>
+                    <?php endif; ?>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Восстанавливаем открытый аккордеон
-        const lastOpenAccordion = localStorage.getItem('lastOpenAccordion');
-        if (lastOpenAccordion) {
-            const collapseElement = document.querySelector(lastOpenAccordion);
-            if (collapseElement) {
-                new bootstrap.Collapse(collapseElement, {
-                    toggle: true
-                });
-            }
-        }
-
-        // Обработчики для аккордеона
-        document.querySelectorAll('.accordion-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const target = this.getAttribute('data-bs-target');
-                localStorage.setItem('lastOpenAccordion', target);
-            });
-        });
-
-        // Переключение между видами жанров
-        const genreInlineCheckbox = document.getElementById('genre-inline-view');
-        if (genreInlineCheckbox) {
-            // Восстановление состояния из localStorage
-            const savedView = localStorage.getItem('genreViewMode');
-            if (savedView === 'horizontal') {
-                genreInlineCheckbox.checked = true;
-                toggleGenreView(true);
-            }
-
-            genreInlineCheckbox.addEventListener('change', function() {
-                const isInline = this.checked;
-                toggleGenreView(isInline);
-                localStorage.setItem('genreViewMode', isInline ? 'horizontal' : 'vertical');
-            });
-        }
-
-        function toggleGenreView(isInline) {
-            const verticalList = document.querySelector('.genre-list-vertical');
-            const horizontalList = document.querySelector('.genre-list-horizontal');
-
-            if (isInline) {
-                verticalList.classList.add('d-none');
-                horizontalList.classList.remove('d-none');
-            } else {
-                verticalList.classList.remove('d-none');
-                horizontalList.classList.add('d-none');
-            }
-        }
-
-        // Поиск по жанрам (работает в обоих режимах)
-        document.querySelectorAll('.genre-search-input').forEach(input => {
-            input.addEventListener('keyup', function() {
-                const searchText = this.value.toLowerCase();
-                const container = this.closest('.accordion-body').querySelector('.genre-list-container');
-
-                // Обрабатываем оба варианта отображения
-                const items = container.querySelectorAll('.genre-item');
-
-                items.forEach(item => {
-                    const text = item.textContent.toLowerCase();
-                    if (text.includes(searchText)) {
-                        item.style.display = '';
-                        // Для компактного режима добавляем класс видимости
-                        item.classList.remove('d-none');
-                    } else {
-                        item.style.display = 'none';
-                        // Для компактного режима добавляем класс скрытия
-                        item.classList.add('d-none');
-                    }
-                });
-            });
-        });
-
-        // Добавьте этот код перед основным скриптом поиска авторов
-        const SearchHelper = {
-            EMPTY_GENRE: "Не установлен",
-            EMPTY_AUTHOR: "Не установлен"
-        };
-
-        class UrlHelper {
-            static addSearchParam(paramName, paramValue, route = 'library/search') {
-                // Получаем базовый URL
-                const baseUrl = new URL(window.location.origin);
-
-                // Создаем новый URL с указанным route
-                const newUrl = new URL(route, baseUrl);
-                const searchParams = new URLSearchParams();
-
-                // Копируем все существующие параметры, кроме search
-                const currentParams = new URLSearchParams(window.location.search);
-                currentParams.forEach((value, key) => {
-                    if (!key.startsWith('search[')) {
-                        searchParams.set(key, value);
-                    }
-                });
-
-                // Собираем параметры search
-                const search = {};
-
-                // Добавляем существующие search параметры
-                currentParams.forEach((value, key) => {
-                    if (key.startsWith('search[') && key.endsWith(']')) {
-                        const param = key.match(/search\[(.*?)\]/)[1];
-                        search[param] = value;
-                    }
-                });
-
-                // Обновляем нужный параметр
-                if (paramValue && paramValue !== SearchHelper.EMPTY_AUTHOR) {
-                    search[paramName] = paramValue;
-                } else {
-                    delete search[paramName];
-                }
-
-                // Добавляем обновленные search параметры
-                for (const [key, value] of Object.entries(search)) {
-                    if (value !== undefined && value !== null && value !== '') {
-                        searchParams.set(`search[${key}]`, value);
-                    }
-                }
-
-                // Устанавливаем параметры в URL
-                newUrl.search = searchParams.toString();
-
-                return newUrl.toString();
-            }
-        }
-
-        // Затем можно добавить предыдущий скрипт поиска авторов
-
-        // Элементы поиска авторов
-        const authorSearchInput = document.querySelector('#authorCollapse .facet-search input');
-        const authorList = document.querySelector('#authorCollapse .facet-list');
-        const authorBadge = document.querySelector('#authorAccordion .accordion-header .badge.bg-secondary');
-
-        if (authorSearchInput && authorList && authorBadge) {
-            // Сохраняем оригинальный список авторов и счетчик
-            const originalAuthors = authorList.innerHTML;
-            const originalCount = authorBadge.textContent.trim();
-
-            // Таймер для задержки запроса
-            let searchTimer;
-
-            // Обработчик ввода текста
-            authorSearchInput.addEventListener('input', function() {
-                clearTimeout(searchTimer);
-                const searchText = this.value.trim();
-
-                // Если поле пустое, показываем исходный список
-                if (searchText === '') {
-                    resetAuthorList();
-                    return;
-                }
-
-                // Задержка перед отправкой запроса (300 мс)
-                searchTimer = setTimeout(() => {
-                    searchAuthors(searchText);
-                }, 300);
-            });
-
-            // Функция поиска авторов
-            function searchAuthors(query) {
-                fetch(`/library/author?q=${encodeURIComponent(query)}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        updateAuthorList(data.authors);
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при поиске авторов:', error);
-                        resetAuthorList();
-                    });
-            }
-
-            // Функция обновления списка авторов и счетчика
-            function updateAuthorList(authorsData) {
-                // Обновляем счетчик
-                authorBadge.textContent = formatNumber(authorsData.count);
-
-                // Обновляем список
-                authorList.innerHTML = '';
-
-                authorsData.data.author_group.buckets.forEach(author => {
-                    const li = document.createElement('li');
-                    const key = author.key || SearchHelper.EMPTY_AUTHOR;
-
-                    li.innerHTML = `
-                    <a href="${UrlHelper.addSearchParam('author', key)}">
-                        ${escapeHtml(key)}
-                        <span class="badge bg-secondary float-end">${formatNumber(author.doc_count)}</span>
-                    </a>
-                `;
-
-                    authorList.appendChild(li);
-                });
-            }
-
-            // Функция сброса к исходному состоянию
-            function resetAuthorList() {
-                authorBadge.textContent = originalCount;
-                authorList.innerHTML = originalAuthors;
-            }
-
-            // Вспомогательные функции
-            function escapeHtml(unsafe) {
-                const div = document.createElement('div');
-                div.textContent = unsafe;
-                return div.innerHTML;
-            }
-
-            function formatNumber(num) {
-                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-            }
-        }
-
-        // Код для поиска по названиям книг
-        const titleSearchInput = document.querySelector('#titleCollapse .facet-search input');
-        const titleList = document.querySelector('#titleCollapse .facet-list');
-        const titleBadge = document.querySelector('#titleAccordion .accordion-header .badge.bg-secondary');
-
-        if (titleSearchInput && titleList && titleBadge) {
-            // Сохраняем оригинальный список названий и счетчик
-            const originalTitles = titleList.innerHTML;
-            const originalCount = titleBadge.textContent.trim();
-
-            // Таймер для задержки запроса
-            let searchTimer;
-
-            // Обработчик ввода текста
-            titleSearchInput.addEventListener('input', function() {
-                clearTimeout(searchTimer);
-                const searchText = this.value.trim();
-
-                // Если поле пустое, показываем исходный список
-                if (searchText === '') {
-                    resetTitleList();
-                    return;
-                }
-
-                // Задержка перед отправкой запроса (300 мс)
-                searchTimer = setTimeout(() => {
-                    searchTitles(searchText);
-                }, 500);
-            });
-
-            // Функция поиска названий
-            function searchTitles(query) {
-                fetch(`/library/title?q=${encodeURIComponent(query)}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        updateTitleList(data.titles);
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при поиске названий:', error);
-                        resetTitleList();
-                    });
-            }
-
-            // Функция обновления списка названий и счетчика
-            function updateTitleList(titlesData) {
-                // Обновляем счетчик
-                titleBadge.textContent = formatNumber(titlesData.count);
-
-                // Обновляем список
-                titleList.innerHTML = '';
-
-                titlesData.data.title_group.buckets.forEach(title => {
-                    // Пропускаем пустые названия
-                    if (!title.key) return;
-
-                    const li = document.createElement('li');
-                    const key = title.key;
-
-                    // Обрезаем длинные названия до 30 символов
-                    const displayText = key.length > 255 ?
-                        key.substring(0, 255) + '...' :
-                        key;
-
-                    li.innerHTML = `
-                <a href="${UrlHelper.addSearchParam('title', key)}">
-                    ${escapeHtml(displayText)}
-                    <span class="badge bg-secondary float-end">${formatNumber(title.doc_count)}</span>
-                </a>
-            `;
-
-                    titleList.appendChild(li);
-                });
-            }
-
-            // Функция сброса к исходному состоянию
-            function resetTitleList() {
-                titleBadge.textContent = originalCount;
-                titleList.innerHTML = originalTitles;
-            }
-        }
-
-    });
-</script>
+<?php $this->registerJsFile('/js/library-search.js', ['position' => \yii\web\View::POS_END]);

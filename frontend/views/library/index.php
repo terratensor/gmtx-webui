@@ -95,8 +95,13 @@ echo Html::endForm();
           </h2>
           <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
             <div class="accordion-body p-0">
-              <div class="facet-search mb-2 px-2">
-                <input type="text" class="form-control form-control-sm" placeholder="Начните вводить имя для поиска...">
+              <div class="facet-search mb-2 px-2 position-relative">
+                <input type="text" class="form-control form-control-sm" placeholder="Начните вводить имя для поиска…">
+                <div class="position-absolute top-50 end-0 translate-middle-y loading-indicator d-none">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                  </div>
+                </div>
               </div>
               <ul class="facet-list">
                 <?php foreach ($results['authors']['data']['author_group']['buckets'] as $author): ?>
@@ -131,8 +136,13 @@ echo Html::endForm();
           </h2>
           <div id="titleCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">
             <div class="accordion-body p-0">
-              <div class="facet-search mb-2 px-2">
-                <input type="text" class="form-control form-control-sm" placeholder="Поиск названий...">
+              <div class="facet-search mb-2 px-2 position-relative">
+                <input type="text" class="form-control form-control-sm" placeholder="Начните вводить название для поиска…">
+                <div class="position-absolute top-50 end-0 translate-middle-y loading-indicator d-none">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                  </div>
+                </div>
               </div>
               <ul class="facet-list">
                 <?php foreach ($results['titles']['data']['title_group']['buckets'] as $title): ?>

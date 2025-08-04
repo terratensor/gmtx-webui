@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\repositories;
 
+use Yii;
 use Manticoresearch\Table;
 use Manticoresearch\Client;
 use Manticoresearch\Search;
+use yii\caching\TagDependency;
 
 class AuthorRepository
 {
@@ -38,26 +40,36 @@ class AuthorRepository
 
     public function findFacetsByName(string $value): array
     {
-        $result = [];
-        // Получаем количество категорий из таблицы categories
-        if ($value == '' && strlen($value) < 2) {
-            $query_count = "SELECT COUNT(*) FROM authors";
-        } else {
-            $query_count = "SELECT COUNT(*) FROM authors WHERE MATCH('@name ^$value*')";
-        }
-        $response = $this->client->sql($query_count, true);
-        $limit = $response[0] ?? 100;        
+        $cacheKey = __METHOD__ . '_' . md5($value);
+        $cacheDuration = 3600; // 1 час
 
-        $result['count'] = $limit;
+        return Yii::$app->cache->getOrSet(
+            $cacheKey,
+            function () use ($value) {
+                $result = [];
+                // Получаем количество категорий из таблицы categories
+                if ($value == '' && strlen($value) < 2) {
+                    $query_count = "SELECT COUNT(*) FROM authors";
+                } else {
+                    $query_count = "SELECT COUNT(*) FROM authors WHERE MATCH('@name ^$value*')";
+                }
+                $response = $this->client->sql($query_count, true);
+                $limit = $response[0] ?? 100;
 
-        $this->search->search("@author ^$value*");
-        $this->search->setSource(['id', 'name']);
-        $this->search->facet('author', 'author_group', 100, 'count(*)', 'desc');
-        $this->search->limit($this->pageSize);
+                $result['count'] = $limit;
 
-        $result['data'] = $this->search->get()->getFacets();
+                $this->search->search("@author ^$value*");
+                $this->search->setSource(['id', 'name']);
+                $this->search->facet('author', 'author_group', 100, 'count(*)', 'desc');
+                $this->search->limit(0);
 
-        return $result;
+                $result['data'] = $this->search->get()->getFacets();
+
+                return $result;
+            },
+            $cacheDuration,
+            new TagDependency(['tags' => 'authors'])
+        );
     }
 
     /**
