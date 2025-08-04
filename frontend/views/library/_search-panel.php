@@ -91,7 +91,7 @@ $inputTemplate = '<div class="input-group mb-2">
             </div>
         <?php endif; ?>
 
-        <?= $this->render('_search-settings-panel', ['model' => $model, 'form' => $form]); ?>
+        <?= $this->render('_search-settings-panel', ['model' => $model, 'form' => $form, 'total_count' => $total_count ?? 0]); ?>
 
         <?php ActiveForm::end(); ?>
 

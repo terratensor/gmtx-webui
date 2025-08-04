@@ -76,10 +76,10 @@ class ManticoreService
     public function facets(): array
     {
         $facets = [];
+        $facets['total_count'] = $this->paragraphRepository->getTotalCount(true);
         $facets['genres'] = $this->paragraphRepository->findGenreFacets();
         $facets['authors'] = $this->authorRepository->findFacetsByName('');
         $facets['titles'] = $this->titleRepository->findFacetsByName('');
-        // var_dump($facets['authors']);
         return $facets;
     }
 

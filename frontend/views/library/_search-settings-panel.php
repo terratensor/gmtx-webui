@@ -10,13 +10,20 @@ use src\Search\helpers\SearchHelper;
 /** @var SearchForm $model */
 
 $aggs = $this->params['aggs'] ?? [];
+$summary = '';
+if ($total_count) {
+  $summary = "<small>Всего записей в библиотеке: <b>" . number_format($total_count ?? 0, 0, '', ' ') . "</b></small>";
+} else {
+  $summary = "<small>Найдено записей: <b>" . number_format($aggs['hits']['total'] ?? 0, 0, '', ' ') . "</b></small>";
+}
+
 ?>
 <div id="search-setting-panel"
   class="search-setting-panel <?= Yii::$app->session->get('show_search_settings') ? 'show-search-settings' : '' ?>">
   <div class="sidebar">
     <div class="sidebar-header d-flex justify-content-between">
       <div>
-        <small>Найдено записей: <b><?= number_format($aggs['hits']['total'] ?? 0, 0, '', ' ') ?></b></small>
+        <?= $summary ?>
       </div>
       <button type="button" id="close-search-settings" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>

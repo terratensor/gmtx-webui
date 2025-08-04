@@ -10,6 +10,7 @@ use Manticoresearch\Client;
 use Manticoresearch\Search;
 use Manticoresearch\Query\In;
 use Manticoresearch\Response;
+use yii\caching\TagDependency;
 use src\Search\forms\SearchForm;
 use Manticoresearch\Query\Equals;
 use Manticoresearch\Query\BoolQuery;
@@ -429,6 +430,23 @@ class ParagraphRepository
         $par->setId((int)$hit->getId());
 
         return $par;
+    }
+
+    public function getTotalCount(bool $rawMode): int
+    {
+        $cacheKey = __METHOD__ . '_' . md5(strval($rawMode));
+        $cacheDuration = 3600; // 1 час
+
+        return Yii::$app->cache->getOrSet(
+            $cacheKey,
+            function () use ($rawMode) {
+                $query = "SELECT COUNT(*) FROM library2025";
+                $response = $this->client->sql($query, $rawMode);
+                return $response[0] ?? 0;
+            },
+            $cacheDuration,
+            new TagDependency(['tags' => 'authors'])
+        );
     }
 
     /**

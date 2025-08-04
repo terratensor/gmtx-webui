@@ -18,7 +18,7 @@ echo Html::endForm();
 
 ?>
 <div class="site-index">
-  <?= $this->render('_search-panel', ['model' => $model]); ?>
+  <?= $this->render('_search-panel', ['model' => $model, 'total_count' => $results['total_count'] ?? 0]); ?>
   <div class="container-fluid search-results">
 
 
