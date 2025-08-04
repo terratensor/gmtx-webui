@@ -29,14 +29,14 @@ class TitleRepository
         }
     }
 
-    public function findFacetsByName(string $value): array
+    public function findFacetsByName(string $value, ?string $genre = null, ?string $author = null): array
     {
         $cacheKey = __METHOD__ . '_' . md5($value);
         $cacheDuration = 3600; // 1 час
 
         return Yii::$app->cache->getOrSet(
             $cacheKey,
-            function () use ($value) {
+            function () use ($value, $genre, $author) {
                 $result = [];
                 // Получаем количество категорий из таблицы categories
                 if ($value == '') {
@@ -52,6 +52,12 @@ class TitleRepository
                     $value = "@title $value";
                 }
                 $this->search->search($value);
+                if ($genre !== null) {                    
+                    $this->search->filter('genre', 'in', $genre);
+                }
+                if ($author !== null) {
+                    $this->search->filter('author', 'in', $author);
+                }
                 $this->search->setSource(['id', 'name']);
                 $this->search->facet('title', 'title_group', 100, 'count(*)', 'desc');
                 $this->search->limit(0);

@@ -18,7 +18,7 @@ class AuthorService
     public function findAuthor($value)
     {
         $facets = [];
-        $result = $this->authorRepository->findFacetsByName($value);
+        $result = $this->authorRepository->findFacetsByName($value, $genre = null, $title = null);
 
         $facets['authors'] = $result;
 

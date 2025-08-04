@@ -83,11 +83,11 @@ class ManticoreService
         return $facets;
     }
 
-    public function aggs(SearchForm $form)
-    {
-        $resp = $this->paragraphRepository->findAggsAll($form);
-        return $resp->getResponse();
-    }
+    // public function aggs(SearchForm $form)
+    // {
+    //     $resp = $this->paragraphRepository->findAggsAll($form);
+    //     return $resp->getResponse();
+    // }
 
     public function findByBook(int $id): ParagraphDataProvider
     {
