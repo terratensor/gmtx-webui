@@ -17,9 +17,8 @@ class TitleService
 
     public function findTitle($value)
     {
-        $genre = 'Социология';
         $facets = [];
-        $result = $this->titleRepository->findFacetsByName($value, $genre, $author = null);
+        $result = $this->titleRepository->findFacetsByName($value, $genre = null, $author = null);
 
         $facets['titles'] = $result;
 
