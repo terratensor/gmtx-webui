@@ -18,7 +18,7 @@ class AuthorRepository
     public int $pageSize = 20;
 
     public function __construct(Client $client, $pageSize)
-    {        
+    {
         $this->client = $client;
         $this->search = new Search($this->client);
         $this->search->setTable($this->indexName);
@@ -28,27 +28,25 @@ class AuthorRepository
     }
 
     public function findByName($value)
-    {        
+    {
         $this->search->search("^$value*");
         $this->search->setSource(['id', 'name']);
         $this->search->limit($this->pageSize);
-        
+
         return $this->search->get();
     }
 
-    public function findFacetsByName($value): array
+    public function findFacetsByName(string $value): array
     {
         $result = [];
         // Получаем количество категорий из таблицы categories
-        if ($value == '') {
+        if ($value == '' && strlen($value) < 2) {
             $query_count = "SELECT COUNT(*) FROM authors";
-        } else {            
+        } else {
             $query_count = "SELECT COUNT(*) FROM authors WHERE MATCH('@name ^$value*')";
         }
         $response = $this->client->sql($query_count, true);
-        $limit = $response[0] ?? 100;
-
-        // var_dump($limit);
+        $limit = $response[0] ?? 100;        
 
         $result['count'] = $limit;
 
@@ -58,7 +56,7 @@ class AuthorRepository
         $this->search->limit($this->pageSize);
 
         $result['data'] = $this->search->get()->getFacets();
-        
+
         return $result;
     }
 
