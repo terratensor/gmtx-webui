@@ -88,10 +88,10 @@ echo Html::endForm();
         </div>
                         <?php //var_dump($results['authors']); die(); ?>
         <!-- Авторы -->
-        <div class="accordion-item">
+        <div class="accordion-item" id="authorAccordion">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
-              <i class="bi bi-person me-2"></i> Авторы <span class="badge bg-danger"><?= number_format($results['authors']['count'], 0, '', ' ') ?></span>
+              <i class="bi bi-person me-2"></i> Авторы <span class="badge bg-danger author-badge"><?= number_format($results['authors']['count'], 0, '', ' ') ?></span>
             </button>
           </h2>
           <div id="authorCollapse" class="accordion-collapse collapse" data-bs-parent="#filtersAccordion">

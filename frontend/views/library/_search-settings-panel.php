@@ -112,7 +112,7 @@ $aggs = $this->params['aggs'] ?? [];
 
                     <!-- Остальные аккордеоны (авторы, названия) остаются без изменений -->
                     <!-- Авторы -->
-                    <div class="accordion-item">
+                    <div class="accordion-item" id="authorAccordion">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorCollapse">
                                 <i class="bi bi-person me-2"></i> Авторы
@@ -314,10 +314,12 @@ class UrlHelper {
     // Элементы поиска авторов
     const authorSearchInput = document.querySelector('#authorCollapse .facet-search input');
     const authorList = document.querySelector('#authorCollapse .facet-list');
+    const authorBadge = document.querySelector('#authorAccordion .accordion-header .badge.bg-danger');
     
-    if (authorSearchInput && authorList) {
-        // Сохраняем оригинальный список авторов
+    if (authorSearchInput && authorList && authorBadge) {
+        // Сохраняем оригинальный список авторов и счетчик
         const originalAuthors = authorList.innerHTML;
+        const originalCount = authorBadge.textContent.trim();
         
         // Таймер для задержки запроса
         let searchTimer;
@@ -329,7 +331,7 @@ class UrlHelper {
             
             // Если поле пустое, показываем исходный список
             if (searchText === '') {
-                authorList.innerHTML = originalAuthors;
+                resetAuthorList();
                 return;
             }
             
@@ -343,26 +345,27 @@ class UrlHelper {
         function searchAuthors(query) {
             fetch(`/library/author?q=${encodeURIComponent(query)}`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(data => {
-                    updateAuthorList(data.authors.data.author_group.buckets);
+                    updateAuthorList(data.authors);
                 })
                 .catch(error => {
                     console.error('Ошибка при поиске авторов:', error);
-                    // В случае ошибки можно показать сообщение или восстановить исходный список
-                    authorList.innerHTML = originalAuthors;
+                    resetAuthorList();
                 });
         }
         
-        // Функция обновления списка авторов
-        function updateAuthorList(authors) {
+        // Функция обновления списка авторов и счетчика
+        function updateAuthorList(authorsData) {
+            // Обновляем счетчик
+            authorBadge.textContent = formatNumber(authorsData.count);
+            
+            // Обновляем список
             authorList.innerHTML = '';
             
-            authors.forEach(author => {
+            authorsData.data.author_group.buckets.forEach(author => {
                 const li = document.createElement('li');
                 const key = author.key || SearchHelper.EMPTY_AUTHOR;
                 
@@ -377,17 +380,19 @@ class UrlHelper {
             });
         }
         
-        // Вспомогательная функция для экранирования HTML
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+        // Функция сброса к исходному состоянию
+        function resetAuthorList() {
+            authorBadge.textContent = originalCount;
+            authorList.innerHTML = originalAuthors;
         }
         
-        // Вспомогательная функция для форматирования чисел
+        // Вспомогательные функции
+        function escapeHtml(unsafe) {
+            const div = document.createElement('div');
+            div.textContent = unsafe;
+            return div.innerHTML;
+        }
+        
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
