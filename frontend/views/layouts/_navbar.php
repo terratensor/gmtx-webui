@@ -17,7 +17,7 @@ use yii\bootstrap5\NavBar;
     $menuItems = [];
     $menuItems = [
         ['label' => 'Главная', 'url' => ['/site/index']],
-        ['label' => 'Библиотека', 'url' => ['/site/search'], 'visible' => Yii::$app->user->can('member')],
+        ['label' => 'Библиотека', 'url' => ['/library/index'], 'visible' => Yii::$app->user->can('member')],
         ['label' => 'Обратная связь', 'url' => ['/site/contact']],
     ];
     if (Yii::$app->user->isGuest) {

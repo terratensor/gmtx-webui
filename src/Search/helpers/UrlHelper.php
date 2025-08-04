@@ -15,7 +15,7 @@ class UrlHelper
      * @param string $route Маршрут (по умолчанию 'site/search')
      * @return string Сформированный URL
      */
-    public static function addSearchParam($paramName, $paramValue, $route = 'site/search')
+    public static function addSearchParam($paramName, $paramValue, $route = 'library/search')
     {
         // Получаем текущие параметры запроса
         $currentParams = \Yii::$app->request->get();

@@ -4,18 +4,29 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\services;
 
+use src\Library\manticore\repositories\AuthorRepository;
+use src\Library\manticore\repositories\TitleRepository;
 use Yii;
 use src\Search\forms\SearchForm;
 use src\Library\manticore\repositories\ParagraphRepository;
 use src\Library\manticore\repositories\ParagraphDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\data\DataProviderInterface;
 
 class ManticoreService
 {
     private ParagraphRepository $paragraphRepository;
+    private AuthorRepository $authorRepository;
+    private TitleRepository $titleRepository;
 
-    public function __construct(ParagraphRepository $questionRepository)
-    {
+    public function __construct(
+        ParagraphRepository $questionRepository,
+        AuthorRepository $authorRepository,
+        TitleRepository $titleRepository
+    ) {
         $this->paragraphRepository = $questionRepository;
+        $this->authorRepository = $authorRepository;
+        $this->titleRepository = $titleRepository;
     }
 
     /**
@@ -62,40 +73,21 @@ class ManticoreService
         );
     }
 
-    public function facets()
+    public function facets(): array
     {
-        $comments = $this->paragraphRepository->findFacets();
-
-        $responseData = $comments->get()->getResponse()->getResponse();
-        // Определяем параметры пагинации
-        $pagination = [
-            'pageSize' => Yii::$app->params['searchResults']['pageSize'],
-            'pageSizeLimit' => Yii::$app->params['searchResults']['pageSizeLimit'],
-        ];
-        return new ParagraphDataProvider(
-            [
-                'query' => $comments,
-                'pagination' => $pagination,
-                'sort' => [
-                    //                 'defaultOrder' => [
-                    //     'id' => SORT_ASC,
-                    //     'chunk' => SORT_ASC,
-                    // ],
-                    'attributes' => [
-                        'id',
-                        'chunk',
-                    ]
-                ],
-                'responseData' => $responseData
-            ]
-        );
+        $facets = [];
+        $facets['total_count'] = $this->paragraphRepository->getTotalCount(true);
+        $facets['genres'] = $this->paragraphRepository->findGenreFacets();
+        $facets['authors'] = $this->authorRepository->findFacetsByName('');
+        $facets['titles'] = $this->titleRepository->findFacetsByName('');
+        return $facets;
     }
 
-    public function aggs(SearchForm $form)
-    {
-        $resp = $this->paragraphRepository->findAggsAll($form);
-        return $resp->getResponse();
-    }
+    // public function aggs(SearchForm $form)
+    // {
+    //     $resp = $this->paragraphRepository->findAggsAll($form);
+    //     return $resp->getResponse();
+    // }
 
     public function findByBook(int $id): ParagraphDataProvider
     {

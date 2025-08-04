@@ -10,6 +10,7 @@ use Manticoresearch\Client;
 use Manticoresearch\Search;
 use Manticoresearch\Query\In;
 use Manticoresearch\Response;
+use yii\caching\TagDependency;
 use src\Search\forms\SearchForm;
 use Manticoresearch\Query\Equals;
 use Manticoresearch\Query\BoolQuery;
@@ -83,17 +84,6 @@ class ParagraphRepository
                 'post_tags' => '</mark>'
             ],
         );
-
-        return $search;
-    }
-
-    public function findFacets(): Search
-    {
-        // Выполняем поиск если установлен фильтр или установлена строка поиска
-        $search = $this->search->search("и");
-        $search->maxMatches(38000000);
-        // Подготавливаем фасеты
-        $this->prepareFacets($search, 100000, 'count(*)', 'desc');
 
         return $search;
     }
@@ -357,6 +347,70 @@ class ParagraphRepository
         return $paragraph;
     }
 
+
+    /**
+     * Find facets of all genres from categories table
+     *
+     * @return array
+     */
+    public function findGenreFacets(): array
+    {
+        $rawMode = true;
+        $result = [];
+
+        // Получаем количество категорий из таблицы categories
+        $query_count = "SELECT COUNT(*) FROM categories";
+        $response = $this->client->sql($query_count, $rawMode);
+        $limit = $response[0] ?? 100;
+
+        $result['count'] = $limit;
+
+        // Получаем список всех категорий-жанров.
+        $query = "SELECT * FROM categories LIMIT {$limit}";
+        $response = $this->client->sql($query, $rawMode);
+        $genres = [];
+        foreach ($response as $id => $value) {
+            $genres[] = $value['name'];
+        }
+
+        // Получаем по списоку фасеты всех категорий-жанров.
+        $query = "SELECT id, genre from library2025 where genre in ('" . implode('\',\'', $genres) . "', '') limit 0 facet genre ORDER BY count(*) DESC LIMIT $limit";
+        $response = $this->client->sql($query, $rawMode);
+
+        $result['data'] = $response[1]['data'] ?? [];
+        // Возвращаем результат в виде массива
+        return $result;
+    }
+
+    public function findAuthorFacets(): array
+    {
+        $rawMode = true;
+        $result = [];
+
+        // Получаем количество категорий из таблицы categories
+        $query_count = "SELECT COUNT(*) FROM authors";
+        $response = $this->client->sql($query_count, $rawMode);
+        $limit = $response[0] ?? 100;
+
+        $result['count'] = $limit;
+
+        // Получаем список всех категорий-жанров.
+        $query = "SELECT * FROM authors LIMIT {$limit}";
+        $response = $this->client->sql($query, $rawMode);
+        $authors = [];
+        foreach ($response as $id => $value) {
+            $authors[] = $value['name'];
+        }
+
+        // Получаем по списоку фасеты всех категорий-жанров.
+        $query = "SELECT id, author from library2025 where author in ('" . implode('\',\'', $authors) . "', '') limit 0 facet author ORDER BY count(*) DESC LIMIT $limit";
+        $response = $this->client->sql($query, $rawMode);
+
+        $result['data'] = $response[1]['data'] ?? [];
+        // Возвращаем результат в виде массива
+        return $result;
+    }
+
     /**
      * Возвращает paragraph по id
      * @param string $uuid
@@ -376,6 +430,23 @@ class ParagraphRepository
         $par->setId((int)$hit->getId());
 
         return $par;
+    }
+
+    public function getTotalCount(bool $rawMode): int
+    {
+        $cacheKey = __METHOD__ . '_' . md5(strval($rawMode));
+        $cacheDuration = 3600; // 1 час
+
+        return Yii::$app->cache->getOrSet(
+            $cacheKey,
+            function () use ($rawMode) {
+                $query = "SELECT COUNT(*) FROM library2025";
+                $response = $this->client->sql($query, $rawMode);
+                return $response[0] ?? 0;
+            },
+            $cacheDuration,
+            new TagDependency(['tags' => 'authors'])
+        );
     }
 
     /**

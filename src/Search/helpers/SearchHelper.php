@@ -277,7 +277,7 @@ class SearchHelper
             unset($params['page']);
         }
 
-        return array_merge(['site/search'], $params);
+        return array_merge(['library/search'], $params);
     }
 
     public static function getRemoveFilterUrl($field)

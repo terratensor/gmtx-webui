@@ -319,6 +319,10 @@ html[data-bs-theme="light"] {
     background-color: var(--sr-bg-color);
 }
 
+.start-searching {
+    margin-top: 0;
+}
+
 span.link {
     color: #ad3434;
     hover-color: #222222;
@@ -570,7 +574,7 @@ input:focus:-ms-input-placeholder {
 
 /* фасет жанры в строку */
 .search-setting-panel .sidebar-content {
-    padding: 1rem 0.2rem;
+    padding: 0 0.2rem;
 }
 
 /* Общие стили для контейнеров с прокруткой */
@@ -620,7 +624,8 @@ input:focus:-ms-input-placeholder {
 }
 
 .genre-item span.badge.bg-secondary,
-.facet-list span.badge.bg-secondary {
+.facet-list span.badge.bg-secondary,
+.accordion-header span.badge.bg-secondary {
     color: var(--bs-badge-filter-color);
 }
 
@@ -684,7 +689,8 @@ input:focus:-ms-input-placeholder {
 
 /* Контекст */
 [id] {
-    scroll-margin-top: 20px; /* Компенсация для фиксированного header'а */
+    scroll-margin-top: 20px;
+    /* Компенсация для фиксированного header'а */
     transition: background-color 0.3s ease;
 }
 
@@ -705,11 +711,26 @@ input:focus:-ms-input-placeholder {
     transition: transform 0.3s ease;
     z-index: 1020;
     background-color: var(--bs-body-bg);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     transform: translateY(0);
 }
 
 /* Включаем взаимодействие с дочерними элементами */
-.search-block > * {
+.search-block>* {
     pointer-events: auto;
+}
+
+
+/** Индикатор загрузки фильтров*/
+.loading-indicator {
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    margin-right: 1rem !important;
+    padding-top: 5px;
+}
+
+.loading-indicator.d-none {
+    display: block !important;
+    opacity: 0;
+    pointer-events: none;
 }
