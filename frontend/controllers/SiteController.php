@@ -132,42 +132,44 @@ class SiteController extends Controller
         return $this->render('about');
     }
 
-    public function actionSearch(): string
-    {
-        $results = null;
-        $form = new SearchForm();
-        $errorQueryMessage = '';
+    // public function actionSearch(): string
+    // {
+    //     $results = null;
+    //     $form = new SearchForm();
+    //     $errorQueryMessage = '';
 
-        // $aggs = $this->service->aggs($form);
-        if ($form->isEmpty()) {
-            // $results = $this->service->facets();
-        }
+    //     // $aggs = $this->service->aggs($form);
+    //     // var_dump($form->isEmpty());
 
+    //     try {
+    //         if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
+    //             if ($form->isEmpty()) {
+    //                 // var_dump('empty');
+    //                 $results = $this->service->facets();
+    //                 return $this->render('empty_search', [
+    //                     'results' => $results,
+    //                     'model' => $form,
+    //                     'errorQueryMessage' => $errorQueryMessage
+    //                 ]);
+    //             }
+    //             $results = $this->service->search($form);
+    //         }
+    //     } catch (\DomainException $e) {
+    //         Yii::$app->errorHandler->logException($e);
+    //         Yii::$app->session->setFlash('error', $e->getMessage());
+    //     } catch (EmptySearchRequestExceptions $e) {
+    //         $errorQueryMessage = $e->getMessage();
+    //     } catch (Exception $e) {
+    //         $errorQueryMessage = $e->getMessage();
+    //     }
 
-        try {
-            if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
-                // var_dump($form->isEmpty());
-                if (!$form->isEmpty()) {
-                    // $results = $this->service->facets();
-                    $results = $this->service->search($form);
-                } 
-            }
-        } catch (\DomainException $e) {
-            Yii::$app->errorHandler->logException($e);
-            Yii::$app->session->setFlash('error', $e->getMessage());
-        } catch (EmptySearchRequestExceptions $e) {
-            $errorQueryMessage = $e->getMessage();
-        } catch (Exception $e) {
-            $errorQueryMessage = $e->getMessage();
-        }
-
-        return $this->render('search', [
-            'results' => $results ?? null,
-            'aggs' => $aggs ?? [],
-            'model' => $form,
-            'errorQueryMessage' => $errorQueryMessage,
-        ]);
-    }
+    //     return $this->render('search', [
+    //         'results' => $results ?? null,
+    //         'aggs' => $aggs ?? [],
+    //         'model' => $form,
+    //         'errorQueryMessage' => $errorQueryMessage,
+    //     ]);
+    // }
 
     public function actionContext($id): string
     {

@@ -30,6 +30,7 @@ use App\Question\Entity\Question\events\CommentCreated;
 use App\Question\Entity\listeners\CommentCreatedListener;
 use App\Svodd\Entity\Chart\events\StartCommentDataIDSetter;
 use App\Svodd\Entity\listeners\CommentDataIDSetterListener;
+use src\Library\manticore\repositories\AuthorRepository;
 use src\Library\manticore\repositories\ParagraphRepository;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\EventListener\EnvelopeListener;
@@ -87,6 +88,11 @@ class SetUp implements BootstrapInterface
         ]);
 
         $container->setSingleton(ParagraphRepository::class, [], [
+            new Client($app->params['manticore']),
+            $app->params['searchResults']['pageSize'],
+        ]);
+
+        $container->setSingleton(AuthorRepository::class, [], [
             new Client($app->params['manticore']),
             $app->params['searchResults']['pageSize'],
         ]);
