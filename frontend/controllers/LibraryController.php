@@ -106,6 +106,11 @@ class LibraryController extends Controller
         $form = new SearchForm();
         $errorQueryMessage = '';
 
+        $form->load(Yii::$app->request->queryParams);
+        if ($form->isEmpty()) {
+            return $this->redirect('index');
+        }
+
         try {
             if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
                 if ($form->isEmpty()) {
