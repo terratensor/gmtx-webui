@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\services;
 
+use App\Library\manticore\services\VectorizerService;
 use src\Library\manticore\repositories\AuthorRepository;
 use src\Library\manticore\repositories\TitleRepository;
 use Yii;
@@ -18,15 +19,18 @@ class ManticoreService
     private ParagraphRepository $paragraphRepository;
     private AuthorRepository $authorRepository;
     private TitleRepository $titleRepository;
+    private VectorizerService $vectorizer;
 
     public function __construct(
         ParagraphRepository $questionRepository,
         AuthorRepository $authorRepository,
-        TitleRepository $titleRepository
+        TitleRepository $titleRepository,
+        VectorizerService $vectorizer
     ) {
         $this->paragraphRepository = $questionRepository;
         $this->authorRepository = $authorRepository;
         $this->titleRepository = $titleRepository;
+        $this->vectorizer = $vectorizer;
     }
 
     /**
@@ -35,6 +39,8 @@ class ManticoreService
      */
     public function search(SearchForm $form): ParagraphDataProvider
     {
+        $vector = $this->vectorizer->vectorize($form->query);
+        //var_dump($vector);
         $results = match ($form->matching) {
             'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
             'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
