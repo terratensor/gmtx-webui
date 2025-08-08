@@ -15,18 +15,35 @@ class Paragraph extends Model
     public string $title;
     public string $title_attr;
     public string $content;
-    public string $chunk;
-    public string $char_count;
-    public string $word_count;
+    public int $chunk;
+    public int $char_count;
+    public int $word_count;
     public string $language;
-    public string $ocr_quality;
+    public float $ocr_quality;
     public array $highlight;
     public string $source_uuid;
     public string $source;
     public int $datetime;
     public int $created_at;
     public int $updated_at;
-    private int $id;
+    public int $id = 0;
+
+
+   public static function build(array $hitData): self
+    {
+        $model = new static();
+        
+        $attributes = [];
+        foreach ($hitData as $key => $value) {
+            $newKey = str_replace('library2025.', '', $key);
+            $attributes[$newKey] = $value;
+        }
+        
+        // Присваиваем атрибуты модели
+        $model->setAttributes($attributes, false);
+        
+        return $model;
+    }
 
     public static function create(
         string $text,
@@ -37,8 +54,8 @@ class Paragraph extends Model
         $paragraph = new static();
 
         $paragraph->content = $text;
-        $paragraph->chunk = $position;
-        $paragraph->cahr_count = $length;
+        $paragraph->chunk = (int)$position;
+        $paragraph->char_count = (int)$length;
         $paragraph->highlight = $highlight;
 
         return $paragraph;

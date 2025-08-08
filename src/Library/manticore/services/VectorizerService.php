@@ -43,6 +43,8 @@ class VectorizerService
             ],
             CURLOPT_POSTFIELDS => $payload,
             CURLOPT_FAILONERROR => false, // Самостоятельно обрабатываем коды 4xx/5xx
+            CURLOPT_TIMEOUT => 5, // Максимум 5 секунд
+            CURLOPT_CONNECTTIMEOUT => 2, // Таймаут соединения
         ]);
 
         // Выполнение запроса

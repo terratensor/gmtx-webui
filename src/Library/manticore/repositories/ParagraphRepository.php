@@ -14,6 +14,9 @@ use yii\caching\TagDependency;
 use src\Search\forms\SearchForm;
 use Manticoresearch\Query\Equals;
 use Manticoresearch\Query\BoolQuery;
+use Manticoresearch\Query\JoinQuery;
+use Manticoresearch\Query\MatchQuery;
+use PhpParser\Node\Expr\Match_;
 use src\Search\helpers\SearchHelper;
 use src\Library\manticore\models\Paragraph;
 
@@ -217,6 +220,47 @@ class ParagraphRepository
         $search = $this->search->search($query);
 
         return $search;
+    }
+
+    public function findByVector(SearchForm $form, array $vector): Search
+    {
+        $this->search->reset();
+        $this->search->setTable('library2025_content_vectors');
+        $this->search->setSource(['library2025.*']);
+        $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
+        $this->search->join($joinQuery, true)
+            ->knn('content_vector', $vector, 100);            
+
+
+        if ($form->genre !== '') {
+            if ($form->genre === SearchHelper::EMPTY_GENRE) {
+                $this->search->filter('library2025.genre', 'in', "");
+            } else {
+                $this->search->filter('library2025.genre', 'in', $form->genre);
+            }
+        }
+
+        if ($form->author !== '') {
+            if ($form->author === SearchHelper::EMPTY_AUTHOR) {
+                $this->search->filter('library2025.author', 'in', "");
+            } else {
+                $this->search->filter('library2025.author', 'in', $form->author);
+            }
+        }
+
+        if ($form->title !== '') {
+            $this->search->filter('library2025.title', 'in', $form->title);
+        }
+        // $this->search->filter(new BoolQuery()->must(new MatchQuery('content', $form->query)));
+
+            $limit = 200;
+            $sortField = 'count(*)';
+            $sortDirection = 'desc';
+        // Подготавливаем фасеты
+        $this->search->facet('library2025.genre', 'genre_group', $limit, $sortField, $sortDirection);
+        $this->search->facet('library2025.author', 'author_group', $limit, $sortField, $sortDirection);
+        $this->search->facet('library2025.title', 'title_group', $limit, $sortField, $sortDirection);
+        return $this->search;
     }
 
     /**

@@ -38,18 +38,19 @@ class ManticoreService
      * @return ParagraphDataProvider
      */
     public function search(SearchForm $form): ParagraphDataProvider
-    {
-        $vector = $this->vectorizer->vectorize($form->query);
-        //var_dump($vector);
+    {            
         $results = match ($form->matching) {
             'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
             'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
             'match' => $this->paragraphRepository->findByQueryStringMatch($form),
+            'vector' => $this->paragraphRepository->findByVector($form, $this->vectorizer->vectorize($form->query)),
             'context' => $this->paragraphRepository->findByContext($form),
+
         };
 
 
         $responseData = $results->get()->getResponse()->getResponse();
+        // var_dump($responseData);
         // Определяем параметры пагинации
         $pagination = $form->matching === 'context' ? [
             'pageSize' => Yii::$app->params['context']['pageSize'],
@@ -63,16 +64,16 @@ class ManticoreService
                 'query' => $results,
                 'pagination' => $pagination,
                 'sort' => [
-                    'defaultOrder' => [
-                        '_score' => SORT_DESC,
-                        'chunk' => SORT_ASC,
-                        'id' => SORT_ASC,
-                    ],
-                    'attributes' => [
-                        '_score',
-                        'chunk',
-                        'id',
-                    ]
+                    // 'defaultOrder' => [
+                    //     '_score' => SORT_DESC,
+                    //     'chunk' => SORT_ASC,
+                    //     'id' => SORT_ASC,
+                    // ],
+                    // 'attributes' => [
+                    //     '_score',
+                    //     'chunk',
+                    //     'id',
+                    // ]
                 ],
                 'responseData' => $responseData
             ]

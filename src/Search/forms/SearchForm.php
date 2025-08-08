@@ -41,6 +41,7 @@ class SearchForm extends Model
             'query_string' => 'Обычный поиск',
             'match_phrase' => 'Точное соответствие',
             'match' => 'Любое слово',
+            'vector' => 'Векторное соответствие',
         ];
     }
 
