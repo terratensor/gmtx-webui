@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\Url;
 use yii\bootstrap5\Html;
 use yii\data\Pagination;
 use yii\bootstrap5\LinkPager;
@@ -44,6 +45,19 @@ echo Html::endForm();
 <div class="site-index">
   <?= $this->render('_search-panel', ['model' => $model]); ?>
   <div class="container-fluid search-results">
+
+    <?php if ($model->paragraphId): ?>
+      <div class="alert alert-info mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>
+            Показаны параграфы, похожие на <?=Html::a('#'.$model->paragraphId, ['library/paragraph', 'id' => $model->paragraphId], ['target' => '_blank']); ?>
+          </span>
+          <?= Html::a('Вернуться к обычному поиску', ['library/search'], [
+            'class' => 'btn btn-sm btn-outline-primary'
+          ]) ?>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <?php if (!$results): ?>
 
@@ -150,6 +164,33 @@ echo Html::endForm();
                         <i id="share-<?= $paragraph->id ?>" class="bi bi-share" style="font-size: 1.2rem;  margin-top: -8px"
                           data-bs-toggle="tooltip" data-bs-placement="bottom"
                           data-bs-title="Поделиться"></i>
+                        <!-- Ссылка на реузльтаы поиска похожих параграфов -->
+                        <?php
+                        $params = Yii::$app->request->queryParams;
+                        $params['search']['paragraphId'] = $paragraph->id;
+                        $params['search']['matching'] = 'vector';
+                        unset($params['search']['query']); // Очищаем текстовый запрос
+                        unset($params['page']); // Сбрасываем пагинацию
+                        $similarUrl = Url::to(array_merge(['library/search'], $params));
+                        ?>
+                        <?= Html::a(
+                          '<i class="bi bi-intersect" style="font-size: 1.2rem;  margin-top: -8px"></i> Похожие',
+                          $similarUrl,
+                          [
+                            'id' => "similar-{$paragraph->id}",
+                            'data-bs-toggle' => 'tooltip',
+                            'data-bs-placement' => 'bottom',
+                            'data-bs-title' => 'Похожие параграфы',
+                            'style' => 'text-decoration: none;'
+                          ]
+                        ); ?>
+                        <?php
+                        // Добавим кнопку для сброса поиска похожих
+                        if ($model->paragraphId) {
+                          echo Html::a('Очистить поиск похожих', ['library/search'], [
+                            'class' => 'btn btn-sm btn-outline-secondary ms-2'
+                          ]);
+                        } ?>
                       </div>
                       <div class="text-muted small" style="line-height: 1.2; padding-top: 2px">
                         Символов: <?= $paragraph->char_count ?>, слов: <?= $paragraph->word_count ?>

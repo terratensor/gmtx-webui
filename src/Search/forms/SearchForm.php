@@ -10,6 +10,7 @@ use src\Search\helpers\SearchHelper;
 class SearchForm extends Model
 {
     public string $query = '';
+    public $paragraphId = null;
     public string $genre = '';
     public string $author = '';
     public string $title = '';
@@ -19,12 +20,13 @@ class SearchForm extends Model
     public bool $genreInlineView = false;
     // Включает нечёткий поиск 
     public bool $fuzzy = false;
-    public string $matching = 'query_string';
+    public string $matching = 'query_string';    
 
     public function rules(): array
     {
         return [
             ['query', 'string'],
+             ['paragraphId', 'integer', 'min' => 1],
             ['genre', 'string'],
             ['author', 'string'],
             ['title', 'string'],
@@ -61,6 +63,6 @@ class SearchForm extends Model
 
     public function isEmpty(): bool
     {
-        return ($this->query === '' && ($this->genre === '' && $this->author === '' & $this->title === ''));
+        return (($this->query === '' && ($this->genre === '' && $this->author === '' & $this->title === '')) && $this->paragraphId === null);
     }
 }

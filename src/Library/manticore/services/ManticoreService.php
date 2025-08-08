@@ -38,17 +38,25 @@ class ManticoreService
      * @return ParagraphDataProvider
      */
     public function search(SearchForm $form): ParagraphDataProvider
-    {            
-        $results = match ($form->matching) {
-            'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
-            'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
-            'match' => $this->paragraphRepository->findByQueryStringMatch($form),
-            'vector' => $this->paragraphRepository->findByVector($form, $this->vectorizer->vectorize($form->query)),
-            'context' => $this->paragraphRepository->findByContext($form),
-
-        };
-
-
+    {
+        // Обработка поиска по похожим параграфам
+        if ($form->paragraphId && $form->matching === 'vector') {
+            $results = $this->paragraphRepository->findBySimilarParagraphId(
+                (int)$form->paragraphId,
+                $form
+            );
+        }
+        // Обычный поиск
+        else {
+            $results = match ($form->matching) {
+                'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
+                'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
+                'match' => $this->paragraphRepository->findByQueryStringMatch($form),
+                'vector' => $this->paragraphRepository->findByVector($form, $this->vectorizer->vectorize($form->query)),
+                'context' => $this->paragraphRepository->findByContext($form),
+            };
+        }
+// var_dump($results->get()->getResponse()->getResponse());
         $responseData = $results->get()->getResponse()->getResponse();
         // var_dump($responseData);
         // Определяем параметры пагинации

@@ -107,6 +107,15 @@ class LibraryController extends Controller
         $errorQueryMessage = '';
 
         $form->load(Yii::$app->request->queryParams);
+        // Сброс paragraphId при новом текстовом запросе
+        if ($form->query && $form->paragraphId) {
+            $form->paragraphId = null;
+        }
+        // Обработка запроса по ID параграфа
+        // var_dump($form->paragraphId); die();
+        if ($form->paragraphId && $form->matching === 'vector') {
+            $form->query = ''; // Очищаем текстовый запрос
+        }
         if ($form->isEmpty()) {
             return $this->redirect('index');
         }
