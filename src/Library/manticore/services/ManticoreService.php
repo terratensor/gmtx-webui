@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\services;
 
+use App\Library\manticore\services\VectorizerService;
+use src\Library\manticore\models\Paragraph;
 use src\Library\manticore\repositories\AuthorRepository;
 use src\Library\manticore\repositories\TitleRepository;
 use Yii;
@@ -18,15 +20,18 @@ class ManticoreService
     private ParagraphRepository $paragraphRepository;
     private AuthorRepository $authorRepository;
     private TitleRepository $titleRepository;
+    private VectorizerService $vectorizer;
 
     public function __construct(
         ParagraphRepository $questionRepository,
         AuthorRepository $authorRepository,
-        TitleRepository $titleRepository
+        TitleRepository $titleRepository,
+        VectorizerService $vectorizer
     ) {
         $this->paragraphRepository = $questionRepository;
         $this->authorRepository = $authorRepository;
         $this->titleRepository = $titleRepository;
+        $this->vectorizer = $vectorizer;
     }
 
     /**
@@ -35,15 +40,26 @@ class ManticoreService
      */
     public function search(SearchForm $form): ParagraphDataProvider
     {
-        $results = match ($form->matching) {
-            'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
-            'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
-            'match' => $this->paragraphRepository->findByQueryStringMatch($form),
-            'context' => $this->paragraphRepository->findByContext($form),
-        };
-
-
+        // Обработка поиска по похожим параграфам
+        if ($form->paragraphId && $form->matching === 'vector') {
+            $results = $this->paragraphRepository->findBySimilarParagraphId(
+                (int)$form->paragraphId,
+                $form
+            );
+        }
+        // Обычный поиск
+        else {
+            $results = match ($form->matching) {
+                'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
+                'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
+                'match' => $this->paragraphRepository->findByQueryStringMatch($form),
+                'vector' => $this->paragraphRepository->findByVector($form, $this->vectorizer->vectorize($form->query)),
+                'context' => $this->paragraphRepository->findByContext($form),
+            };
+        }
+        // var_dump($results->get()->getResponse()->getResponse());
         $responseData = $results->get()->getResponse()->getResponse();
+        // var_dump($responseData);
         // Определяем параметры пагинации
         $pagination = $form->matching === 'context' ? [
             'pageSize' => Yii::$app->params['context']['pageSize'],
@@ -57,16 +73,16 @@ class ManticoreService
                 'query' => $results,
                 'pagination' => $pagination,
                 'sort' => [
-                    'defaultOrder' => [
-                        '_score' => SORT_DESC,
-                        'chunk' => SORT_ASC,
-                        'id' => SORT_ASC,
-                    ],
-                    'attributes' => [
-                        '_score',
-                        'chunk',
-                        'id',
-                    ]
+                    // 'defaultOrder' => [
+                    //     '_score' => SORT_DESC,
+                    //     'chunk' => SORT_ASC,
+                    //     'id' => SORT_ASC,
+                    // ],
+                    // 'attributes' => [
+                    //     '_score',
+                    //     'chunk',
+                    //     'id',
+                    // ]
                 ],
                 'responseData' => $responseData
             ]

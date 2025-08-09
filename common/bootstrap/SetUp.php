@@ -23,6 +23,7 @@ use App\services\Manticore\IndexService;
 use App\Indexer\Service\IndexFromDB\Handler;
 use App\dispatchers\SimpleAppEventDispatcher;
 use App\Indexer\Service\QuestionIndexService;
+use App\Library\manticore\services\VectorizerService;
 use Symfony\Component\Mailer\MailerInterface;
 use App\repositories\Question\QuestionRepository;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -102,6 +103,11 @@ class SetUp implements BootstrapInterface
             new Client($app->params['manticore']),
             $app->params['searchResults']['pageSize'],
         ]);
+
+        $container->setSingleton(VectorizerService::class, [], [
+            $app->params['vectorizer']['apiUrl'],
+            $app->params['vectorizer']['apiKey'],
+        ]);        
 
         require __DIR__ . '/twig.php';
     }

@@ -6,17 +6,18 @@ namespace frontend\controllers;
 
 use Yii;
 use Exception;
-use src\Library\manticore\services\AuthorService;
+use yii\web\Response;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use src\Search\forms\SearchForm;
+use yii\web\NotFoundHttpException;
+use src\Library\manticore\services\TitleService;
+use src\Library\manticore\services\AuthorService;
 use src\Library\manticore\services\ContextService;
 use src\Library\manticore\services\ManticoreService;
 use src\Search\Http\Action\V1\SearchSettings\ToggleAction;
 use src\Library\manticore\services\EmptySearchRequestExceptions;
-use src\Library\manticore\services\TitleService;
-use yii\web\Response;
 
 class LibraryController extends Controller
 {
@@ -107,6 +108,15 @@ class LibraryController extends Controller
         $errorQueryMessage = '';
 
         $form->load(Yii::$app->request->queryParams);
+        // Сброс paragraphId при новом текстовом запросе
+        if ($form->query && $form->paragraphId) {
+            $form->paragraphId = null;
+        }
+        // Обработка запроса по ID параграфа
+        // var_dump($form->paragraphId); die();
+        if ($form->paragraphId && $form->matching === 'vector') {
+            $form->query = ''; // Очищаем текстовый запрос
+        }
         if ($form->isEmpty()) {
             return $this->redirect('index');
         }
@@ -132,6 +142,19 @@ class LibraryController extends Controller
             'aggs' => $aggs ?? [],
             'model' => $form,
             'errorQueryMessage' => $errorQueryMessage,
+        ]);
+    }
+
+    public function actionParagraph($id)
+    {
+        try {
+            $quoteResult = $this->contextService->handle($id);
+            // $model = $this->service->findParagraphById($id);
+        } catch (\DomainException $e) {
+            throw new NotFoundHttpException('Запрашиваемый параграф не найден');
+        };
+        return $this->render('paragraph', [
+            'quoteResult' => $quoteResult,
         ]);
     }
 

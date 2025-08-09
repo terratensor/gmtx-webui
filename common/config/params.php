@@ -63,4 +63,9 @@ return [
         'common' => getenv('MANTICORE_DB_NAME_COMMON') ?: 'library2025',
         'concept' => getenv('MANTICORE_DB_NAME_COMMON') . '_concept' ?: 'library_concept',
     ],
+
+    'vectorizer' => [
+        'apiUrl' =>  getenv('MANTICORE_HOST').':'.(int)getenv('MANTICORE_PORT'),
+        'apiKey' => getenv('MANTICORE_API_KEY'),
+    ],
 ];

@@ -64,10 +64,14 @@ class ParagraphDataProvider extends BaseDataProvider
             }
 
             for ($count = 0; $count < $limit; ++$count) {
-                $model = new Paragraph($data->current()->getData());
-                $model->setId((int)$data->current()->getId());
+                $hit = $data->current();
+                //$model = new Paragraph($data->current()->getData());
+                $model = Paragraph::build($hit->getData());
+                if ($model->getId() === 0) {                
+                    $model->setId((int)$hit->getId());
+                }
                 try {
-                    $model->highlight = $data->current()->getHighlight();
+                    $model->highlight = $hit->getHighlight();
                 } catch (\Exception $e) {
                     $model->highlight = [];
                 }

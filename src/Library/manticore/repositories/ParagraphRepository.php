@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\repositories;
 
+use DomainException;
 use Yii;
+use Exception;
 use Manticoresearch\Table;
 use Manticoresearch\Client;
 use Manticoresearch\Search;
 use Manticoresearch\Query\In;
 use Manticoresearch\Response;
 use yii\caching\TagDependency;
+use PhpParser\Node\Expr\Match_;
 use src\Search\forms\SearchForm;
 use Manticoresearch\Query\Equals;
 use Manticoresearch\Query\BoolQuery;
+use Manticoresearch\Query\JoinQuery;
 use src\Search\helpers\SearchHelper;
+use Manticoresearch\Query\MatchQuery;
 use src\Library\manticore\models\Paragraph;
 
 
@@ -219,6 +224,111 @@ class ParagraphRepository
         return $search;
     }
 
+    public function findByVector(SearchForm $form, array $vector): Search
+    {
+        $this->search->reset();
+        $this->search->setTable('library2025_content_vectors');
+        $this->search->setSource(['library2025.*']);
+        $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
+        $this->search->join($joinQuery, true)
+            ->knn('content_vector', $vector, 100);
+
+
+        if ($form->genre !== '') {
+            if ($form->genre === SearchHelper::EMPTY_GENRE) {
+                $this->search->filter('library2025.genre', 'in', "");
+            } else {
+                $this->search->filter('library2025.genre', 'in', $form->genre);
+            }
+        }
+
+        if ($form->author !== '') {
+            if ($form->author === SearchHelper::EMPTY_AUTHOR) {
+                $this->search->filter('library2025.author', 'in', "");
+            } else {
+                $this->search->filter('library2025.author', 'in', $form->author);
+            }
+        }
+
+        if ($form->title !== '') {
+            $this->search->filter('library2025.title', 'in', $form->title);
+        }
+        // $this->search->filter(new BoolQuery()->must(new MatchQuery('content', $form->query)));
+
+        $limit = 200;
+        $sortField = 'count(*)';
+        $sortDirection = 'desc';
+        // Подготавливаем фасеты
+        $this->search->facet('library2025.genre', 'genre_group', $limit, $sortField, $sortDirection);
+        $this->search->facet('library2025.author', 'author_group', $limit, $sortField, $sortDirection);
+        $this->search->facet('library2025.title', 'title_group', $limit, $sortField, $sortDirection);
+        return $this->search;
+    }
+
+    public function findBySimilarParagraphId(int $paragraphId, SearchForm $form): Search
+    {
+        $content_vector = [];
+        $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
+        try {
+            $response = $this->client->sql($query);
+            // var_dump($response['hits']['hits'] ); die();
+            $hits = $response['hits']['hits'] ?? [];
+            $source = $hits[0]['_source'] ?? [];
+
+            $content_vector = empty($hits) ? null : $source['content_vector'];
+
+            // Для отладки:
+            if ($content_vector === null) {
+                error_log("Document not found for paragraphId: $paragraphId");
+            }
+
+            // var_dump($_id); // или используйте значение
+        } catch (Exception $e) {
+            // Обработка ошибок запроса
+            error_log("Manticore query failed: " . $e->getMessage());
+            throw new DomainException("Failed to execute Manticore query: " . $e->getMessage());
+        }
+
+        $this->search->reset();
+        $this->search->setTable('library2025_content_vectors');
+        $this->search->setSource(['library2025.*']);
+        // var_dump($_id);
+        $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
+        $this->search->join($joinQuery, true)
+            ->knn('content_vector', $content_vector, 100);
+
+        // Применяем фильтры
+        if ($form->genre !== '') {
+            $this->search->filter(
+                'library2025.genre',
+                'in',
+                $form->genre === SearchHelper::EMPTY_GENRE ? "" : $form->genre
+            );
+        }
+
+        if ($form->author !== '') {
+            $this->search->filter(
+                'library2025.author',
+                'in',
+                $form->author === SearchHelper::EMPTY_AUTHOR ? "" : $form->author
+            );
+        }
+
+        if ($form->title !== '') {
+            $this->search->filter('library2025.title', 'in', $form->title);
+        }
+
+        // Фасеты
+        $limit = 200;
+        $sortField = 'count(*)';
+        $sortDirection = 'desc';
+        $this->search->facet('library2025.genre', 'genre_group', $limit, $sortField, $sortDirection);
+        $this->search->facet('library2025.author', 'author_group', $limit, $sortField, $sortDirection);
+        $this->search->facet('library2025.title', 'title_group', $limit, $sortField, $sortDirection);
+
+        return $this->search;
+    }
+
     /**
      * @param $queryString String Число или строка чисел через запятую
      * @param string|null $indexName
@@ -413,17 +523,17 @@ class ParagraphRepository
 
     /**
      * Возвращает paragraph по id
-     * @param string $uuid
+     * @param int $uuid
      * @return Paragraph
      */
-    public function getByParagraphID(string $id): Paragraph
+    public function getByParagraphID(int $id): Paragraph
     {
         $table =  new Table($this->client, 'library2025');
         /** @var \Manticoresearch\ResultHit **/
         $hit = $table->getDocumentById($id);
 
         if (!$hit) {
-            throw new \DomainException('Параграф с не найден');
+            throw new DomainException('Параграф не найден');
         }
 
         $par = new Paragraph($hit->getData());
