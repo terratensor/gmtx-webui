@@ -50,11 +50,11 @@ echo Html::endForm();
       <div class="alert alert-info mt-3">
         <div class="d-flex justify-content-between align-items-center">
           <span>
-            Показаны параграфы, похожие на <?=Html::a('#'.$model->paragraphId, ['library/paragraph', 'id' => $model->paragraphId], ['target' => '_blank']); ?>
+            Показаны параграфы, похожие на <?= Html::a($model->paragraphId, ['library/paragraph', 'id' => $model->paragraphId], ['target' => '_blank']); ?>
           </span>
-          <?= Html::a('Вернуться к обычному поиску', ['library/search'], [
-            'class' => 'btn btn-sm btn-outline-primary'
-          ]) ?>
+          <!-- <?= Html::a('Вернуться к обычному поиску', ['library/search'], [
+                  'class' => 'btn btn-sm btn-outline-primary'
+                ]) ?> -->
         </div>
       </div>
     <?php endif; ?>
@@ -181,22 +181,23 @@ echo Html::endForm();
                             'data-bs-toggle' => 'tooltip',
                             'data-bs-placement' => 'bottom',
                             'data-bs-title' => 'Похожие параграфы',
-                            'style' => 'text-decoration: none;'
+                            'style' => 'text-decoration: none;',
+                            'target' => '_blank'
                           ]
                         ); ?>
                         <?php
-                        // Добавим кнопку для сброса поиска похожих
-                        if ($model->paragraphId) {
-                          echo Html::a('Очистить поиск похожих', ['library/search'], [
-                            'class' => 'btn btn-sm btn-outline-secondary ms-2'
-                          ]);
-                        } ?>
-                      </div>
-                      <div class="text-muted small" style="line-height: 1.2; padding-top: 2px">
-                        Символов: <?= $paragraph->char_count ?>, слов: <?= $paragraph->word_count ?>
+                        // кнопка для сброса поиска похожих
+                        // if ($model->paragraphId) {
+                        //   echo Html::a('Очистить поиск похожих', ['library/search'], [
+                        //     'class' => 'btn btn-sm btn-outline-secondary ms-2'
+                        //   ]);
+                        // } 
+                        ?>
                       </div>
                     </div>
-
+                    <div class="text-muted small d-none d-md-block" style="line-height: 1.2; padding-top: 2px">
+                      Симв: <?= $paragraph->char_count ?>, токенов: <?= $paragraph->word_count ?>, пар-ф: <?= $paragraph->chunk ?>, кач: <?= $paragraph->ocr_quality ?>, язык: <?= $paragraph->language ?>
+                    </div>
                     <!-- Правый блок с источником -->
                     <div class="source d-flex align-items-center gap-2">
                       <span data-bs-toggle="tooltip" data-bs-placement="left"
@@ -211,6 +212,9 @@ echo Html::endForm();
                         data-source="<?= Html::encode($paragraph->source) ?>"></i>
                     </div>
                   </div>
+                  <!-- <div class="text-muted small d-md-none d-sm-block" style="line-height: 1.2; padding-top: 2px">
+                    Симв: <?= $paragraph->char_count ?>, ток: <?= $paragraph->word_count ?>, пар: <?= $paragraph->chunk ?>, кач: <?= $paragraph->ocr_quality ?>, яз: <?= $paragraph->language ?>
+                  </div> -->
                 </div>
               </div>
             <?php endforeach; ?>
