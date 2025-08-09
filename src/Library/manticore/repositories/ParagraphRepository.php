@@ -270,7 +270,7 @@ class ParagraphRepository
         $content_vector = [];
         $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
         try {
-            $response = $this->client->sql($query);           
+            $response = $this->client->sql($query);
             // var_dump($response['hits']['hits'] ); die();
             $hits = $response['hits']['hits'] ?? [];
             $source = $hits[0]['_source'] ?? [];
@@ -286,7 +286,7 @@ class ParagraphRepository
         } catch (Exception $e) {
             // Обработка ошибок запроса
             error_log("Manticore query failed: " . $e->getMessage());
-           throw new DomainException("Failed to execute Manticore query: " . $e->getMessage());
+            throw new DomainException("Failed to execute Manticore query: " . $e->getMessage());
         }
 
         $this->search->reset();
@@ -295,7 +295,7 @@ class ParagraphRepository
         // var_dump($_id);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search->join($joinQuery, true)
-            ->knn('content_vector', $content_vector, 100); 
+            ->knn('content_vector', $content_vector, 100);
 
         // Применяем фильтры
         if ($form->genre !== '') {
@@ -523,17 +523,17 @@ class ParagraphRepository
 
     /**
      * Возвращает paragraph по id
-     * @param string $uuid
+     * @param int $uuid
      * @return Paragraph
      */
-    public function getByParagraphID(string $id): Paragraph
+    public function getByParagraphID(int $id): Paragraph
     {
         $table =  new Table($this->client, 'library2025');
         /** @var \Manticoresearch\ResultHit **/
         $hit = $table->getDocumentById($id);
 
         if (!$hit) {
-            throw new \DomainException('Параграф с не найден');
+            throw new DomainException('Параграф не найден');
         }
 
         $par = new Paragraph($hit->getData());

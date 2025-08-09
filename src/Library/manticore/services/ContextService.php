@@ -21,7 +21,7 @@ class ContextService
     public function handle(string $id): ContextPDO
     {
         try {
-            $paragraph = $this->paragraphRepository->getByParagraphID($id);
+            $paragraph = $this->paragraphRepository->getByParagraphID((int)$id);
         } catch (\Exception $e) {
             throw new \DomainException($e->getMessage());
         }

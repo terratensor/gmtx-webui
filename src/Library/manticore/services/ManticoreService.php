@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace src\Library\manticore\services;
 
 use App\Library\manticore\services\VectorizerService;
+use src\Library\manticore\models\Paragraph;
 use src\Library\manticore\repositories\AuthorRepository;
 use src\Library\manticore\repositories\TitleRepository;
 use Yii;
@@ -56,7 +57,7 @@ class ManticoreService
                 'context' => $this->paragraphRepository->findByContext($form),
             };
         }
-// var_dump($results->get()->getResponse()->getResponse());
+        // var_dump($results->get()->getResponse()->getResponse());
         $responseData = $results->get()->getResponse()->getResponse();
         // var_dump($responseData);
         // Определяем параметры пагинации
