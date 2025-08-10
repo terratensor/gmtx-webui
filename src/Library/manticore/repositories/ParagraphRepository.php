@@ -34,7 +34,6 @@ class ParagraphRepository
 
     public function __construct(Client $client, $pageSize)
     {
-
         $this->setIndexName(Yii::$app->params['indexes']['common']);
         $this->client = $client;
         $this->search = new Search($this->client);
@@ -55,8 +54,6 @@ class ParagraphRepository
         // Экранирует все скобки в строке, если найдена хоть одна непарная.
         $queryString = SearchHelper::escapeUnclosedBrackets($queryString);
 
-        $this->prepareFilters($form);
-
         if ($form->query !== '') {
             // Проверяем, содержит ли запрос какие-либо из поисковых конструкций. Field search operator @author, @title, @genre, @content
             $hasFieldSearchOperator = preg_match('/@(title|author|genre|content)\b/', $queryString);
@@ -69,6 +66,11 @@ class ParagraphRepository
 
         // Выполняем поиск если установлен фильтр или установлена строка поиска
         $search = $this->search->search($queryString);
+
+        static::applyRanker($search);
+
+        $this->prepareFilters($form);
+
         // Подготавливаем фасеты
         $this->prepareFacets($search);
 
@@ -574,6 +576,21 @@ class ParagraphRepository
             }
             $search->option('layouts', $layouts);
         }
+    }
+
+    /**
+     * By default we use BM15 ranker, to make it better we change to BM25
+     * @param  Search $search
+     * @return void
+     */
+    protected static function applyRanker(Search $search): void
+    {
+        $search
+            ->option('cutoff', 0)
+            ->option('ranker', 'proximity_bm25')
+            // ->option('idf', 'plain,tfidf_unnormalized')
+            // ->option('ranker', 'expr(\'10000 * bm25f(1.2,0.75)\')')
+        ;
     }
 
     /**
