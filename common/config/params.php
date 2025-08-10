@@ -40,12 +40,17 @@ return [
         ],
     ],
 
+    'fuzzy_search_enabled' => getenv('FUZZY_SEARCH_ENABLED') ?: false,
+
     'manticore' => [
         'host' => getenv('MANTICORE_HOST'),
         'port' => (int)getenv('MANTICORE_PORT'),
         'curl' => [
             CURLOPT_HTTPHEADER => ["X-API-Key: " . getenv('MANTICORE_API_KEY')]
         ],
+        'retries' => 5,
+        'timeout' => 30,
+        'connection_timeout' => 3,
         'max_matches' => getenv('MANTICORE_MAX_MATCHES') ?: 0, // Maximum amount of matches that the server keeps in RAM for each table and can return to the client. Default is unlimited.
     ],
 
@@ -65,7 +70,7 @@ return [
     ],
 
     'vectorizer' => [
-        'apiUrl' =>  getenv('MANTICORE_HOST').':'.(int)getenv('MANTICORE_PORT'),
+        'apiUrl' =>  getenv('MANTICORE_HOST') . ':' . (int)getenv('MANTICORE_PORT'),
         'apiKey' => getenv('MANTICORE_API_KEY'),
     ],
 ];
