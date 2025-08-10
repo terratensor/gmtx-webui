@@ -233,7 +233,7 @@ class ParagraphRepository
         $this->search->setSource(['library2025.*']);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search->join($joinQuery, true)
-            ->knn('content_vector', $vector, 2);
+            ->knn('content_vector', $vector, 100);
 
 
         if ($form->genre !== '') {
@@ -297,7 +297,7 @@ class ParagraphRepository
         // var_dump($_id);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search->join($joinQuery, true)
-            ->knn('content_vector', $content_vector, 2);
+            ->knn('content_vector', $content_vector, 100);
 
         // Применяем фильтры
         if ($form->genre !== '') {
