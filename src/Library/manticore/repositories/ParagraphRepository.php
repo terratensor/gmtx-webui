@@ -74,7 +74,7 @@ class ParagraphRepository
 
         // Включаем нечёткий поиск, если строка не пустая или не содержит символы, используемые в полнотекстовом поиске
         // и не содержит hash автварки пользователя
-        if ($form->fuzzy) {
+        if ($form->fuzzy && Yii::$app->params['fuzzy_search_enabled']) {
             Yii::$app->session->setFlash('success', "Включена опция «Нечёткий поиск». Для выключения уберите флажок в настройках поиска.");
             static::applyFuzzy($search, true);
         }
@@ -566,12 +566,14 @@ class ParagraphRepository
      */
     protected static function applyFuzzy(Search $search, bool $enable_layouts = false): void
     {
-        $search->option('fuzzy', 1);
-        $layouts = [];
-        if ($enable_layouts) {
-            $layouts = ['ru', 'us'];
+        if (Yii::$app->params['fuzzy_search_enabled'] === true) {
+            $search->option('fuzzy', 1);
+            $layouts = [];
+            if ($enable_layouts) {
+                $layouts = ['ru', 'us'];
+            }
+            $search->option('layouts', $layouts);
         }
-        $search->option('layouts', $layouts);
     }
 
     /**

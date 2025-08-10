@@ -33,10 +33,12 @@ if ($total_count) {
       <?= $form->field($model, 'matching', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])
         ->radioList($model->getMatching(), ['class' => 'form-check-inline'])
         ->label(false); ?>
-      <!-- Чекбокс для включения/выключения нечёткого поиска -->
-      <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
-        ->checkbox()
-        ->label('Нечёткий поиск'); ?>
+      <?php if (Yii::$app->params['fuzzy_search_enabled']): ?>
+        <!-- Чекбокс для включения/выключения нечёткого поиска -->
+        <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])
+          ->checkbox()
+          ->label('Нечёткий поиск'); ?>
+      <?php endif; ?>
       <!-- Чекбокс для включения/выключения однострочного режима -->
       <?= $form->field($model, 'singleLineMode', [
         'options' => ['class' => 'single-line-mode'],
@@ -58,7 +60,7 @@ if ($total_count) {
         'class' => 'form-check-input',
         'id' => 'genre-inline-view',
         'uncheck' => null,
-      ], false)->label('Компактный вид жанров (компактный вид фильтров?)');
+      ], false)->label('Компактный вид жанров');
       ?>
       <?php if (!empty($aggs)) : ?>
         <div class="accordion" id="filtersAccordion">

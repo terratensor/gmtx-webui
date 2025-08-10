@@ -107,7 +107,7 @@ class SetUp implements BootstrapInterface
         $container->setSingleton(VectorizerService::class, [], [
             $app->params['vectorizer']['apiUrl'],
             $app->params['vectorizer']['apiKey'],
-        ]);        
+        ]);
 
         require __DIR__ . '/twig.php';
     }
