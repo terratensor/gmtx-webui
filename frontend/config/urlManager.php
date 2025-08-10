@@ -22,7 +22,7 @@ return [
         'library' => 'library/index',
         'library/search' => 'library/search',
         'library/context' => 'site/context',
-        'library/paragraph/<id:\d+>' => 'library/paragraph',
+        'library/quote/<id:\d+>' => 'library/paragraph',
 
         '<_c:[\w\-]+>' => '<_c>/index',
         '<_c:[\w\-]+>/<id:\d+>' => '<_c>/view',
