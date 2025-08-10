@@ -233,7 +233,7 @@ class ParagraphRepository
         $this->search->setSource(['library2025.*']);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search->join($joinQuery, true)
-            ->knn('content_vector', $vector, 100);
+            ->knn('content_vector', $vector, 2);
 
 
         if ($form->genre !== '') {
@@ -297,7 +297,7 @@ class ParagraphRepository
         // var_dump($_id);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search->join($joinQuery, true)
-            ->knn('content_vector', $content_vector, 100);
+            ->knn('content_vector', $content_vector, 2);
 
         // Применяем фильтры
         if ($form->genre !== '') {
@@ -363,14 +363,14 @@ class ParagraphRepository
         if (!empty($result)) {
             $query->must(new In('id', array_values($result)));
         } else {
-            throw new \DomainException('Неправильный запрос, при поиске по номеру(ам) надо указать номер параграфа, или перечислить номера через запятую');
+            throw new DomainException('Неправильный запрос, при поиске по номеру(ам) надо указать номер параграфа, или перечислить номера через запятую');
         }
 
         // Выполняем поиск если установлен фильтр или установлен строка поиска
         if ($form->query) {
             $search = $this->search->search($query);
         } else {
-            throw new \DomainException('Задан пустой поисковый запрос');
+            throw new DomainException('Задан пустой поисковый запрос');
         }
 
         $search->highlight(
