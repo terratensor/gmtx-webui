@@ -33,6 +33,9 @@ if ($total_count) {
       <?= $form->field($model, 'matching', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])
         ->radioList($model->getMatching(), ['class' => 'form-check-inline'])
         ->label(false); ?>
+      <?= $form->field($model, 'model', ['inline' => true, 'options' => ['class' => 'pb-2 pt-1']])
+        ->radioList(['glove' => 'glove','e5-small' => 'e5-small'], ['class' => 'form-check-inline'])
+        ->label(false); ?>
       <?php if (Yii::$app->params['fuzzy_search_enabled']): ?>
         <!-- Чекбокс для включения/выключения нечёткого поиска -->
         <?= $form->field($model, 'fuzzy', ['options' => ['class' => '']])

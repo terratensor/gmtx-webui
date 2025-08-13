@@ -165,34 +165,10 @@ echo Html::endForm();
                           data-bs-toggle="tooltip" data-bs-placement="bottom"
                           data-bs-title="Поделиться"></i>
                         <!-- Ссылка на реузльтаы поиска похожих параграфов -->
-                        <?php
-                        $params = Yii::$app->request->queryParams;
-                        $params['search']['paragraphId'] = $paragraph->id;
-                        $params['search']['matching'] = 'vector';
-                        unset($params['search']['query']); // Очищаем текстовый запрос
-                        unset($params['page']); // Сбрасываем пагинацию
-                        $similarUrl = Url::to(array_merge(['library/search'], $params));
-                        ?>
-                        <?= Html::a(
-                          '<i class="bi bi-intersect" style="font-size: 1.2rem;  margin-top: -8px"></i> Похожие',
-                          $similarUrl,
-                          [
-                            'id' => "similar-{$paragraph->id}",
-                            'data-bs-toggle' => 'tooltip',
-                            'data-bs-placement' => 'bottom',
-                            'data-bs-title' => 'Похожие параграфы',
-                            'style' => 'text-decoration: none;',
-                            'target' => '_blank'
-                          ]
-                        ); ?>
-                        <?php
-                        // кнопка для сброса поиска похожих
-                        // if ($model->paragraphId) {
-                        //   echo Html::a('Очистить поиск похожих', ['library/search'], [
-                        //     'class' => 'btn btn-sm btn-outline-secondary ms-2'
-                        //   ]);
-                        // } 
-                        ?>
+                        <?= \frontend\widgets\SimilarParagraphWidget::widget([
+                          'paragraphId' => $paragraph->id,
+                          'currentParams' => Yii::$app->request->queryParams
+                        ]) ?>
                       </div>
                     </div>
                     <div class="text-muted small d-none d-md-block" style="line-height: 1.2; padding-top: 2px">

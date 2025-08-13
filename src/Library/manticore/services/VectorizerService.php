@@ -23,13 +23,14 @@ class VectorizerService
      * Векторизация текста через внешний API.
      *
      * @param string $text Исходный текст
+     * @param string $model Модель векторизации glove | e5-small
      * @return array Вектор чисел (float)
      * @throws RuntimeException При ошибках сети или API
      */
-    public function vectorize(string $text): array
+    public function vectorize(string $text, string $model = 'glove'): array
     {
         // Формируем данные для запроса
-        $payload = json_encode(['text' => $text], JSON_THROW_ON_ERROR);
+        $payload = json_encode(['text' => $text, 'model' => $model], JSON_THROW_ON_ERROR);
         
         // Инициализация cURL
         $ch = curl_init("{$this->apiUrl}/vectorize");

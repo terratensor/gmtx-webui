@@ -53,7 +53,10 @@ class ManticoreService
                 'query_string' => $this->paragraphRepository->findByQueryStringNew($form),
                 'match_phrase' => $this->paragraphRepository->findByMatchPhrase($form),
                 'match' => $this->paragraphRepository->findByQueryStringMatch($form),
-                'vector' => $this->paragraphRepository->findByVector($form, $this->vectorizer->vectorize($form->query)),
+                'vector' => $this->paragraphRepository->findByVector(
+                    $form,
+                    $this->vectorizer->vectorize($form->query, $form->model)
+                ),
                 'context' => $this->paragraphRepository->findByContext($form),
             };
         }

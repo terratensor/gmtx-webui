@@ -20,7 +20,9 @@ class SearchForm extends Model
     public bool $genreInlineView = false;
     // Включает нечёткий поиск 
     public bool $fuzzy = false;
-    public string $matching = 'query_string';    
+    public string $matching = 'query_string';   
+    
+    public string $model = 'glove';
 
     public function rules(): array
     {
@@ -34,6 +36,7 @@ class SearchForm extends Model
             ['source_uuid', 'string'],
             ['matching', 'in', 'range' => array_keys($this->getMatching())],
             [['singleLineMode', 'fuzzy', 'genreInlineView'], 'boolean'],
+            ['model', 'in', 'range' => ['glove', 'e5-small']],
         ];
     }
 

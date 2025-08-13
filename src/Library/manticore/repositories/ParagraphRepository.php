@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace src\Library\manticore\repositories;
 
 use DomainException;
+use src\Library\manticore\ext\KnnQuery;
 use Yii;
 use Exception;
 use Manticoresearch\Table;
@@ -229,11 +230,18 @@ class ParagraphRepository
     public function findByVector(SearchForm $form, array $vector): Search
     {
         $this->search->reset();
-        $this->search->setTable('library2025_content_vectors');
+        if ($form->model === 'e5-small') {
+            $this->search->setTable('library2025_embeddings2');
+        } else {
+            $this->search->setTable('library2025_content_vectors');
+        }
         $this->search->setSource(['library2025.*']);
+        $query = new KnnQuery('content_vector', $vector, 100, 1000);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search->join($joinQuery, true)
-            ->knn('content_vector', $vector, 100);
+            // ->knn('content_vector', $vector, 200)
+            ->search($query)
+        ;
 
 
         if ($form->genre !== '') {
@@ -270,7 +278,14 @@ class ParagraphRepository
     public function findBySimilarParagraphId(int $paragraphId, SearchForm $form): Search
     {
         $content_vector = [];
-        $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
+        if ($form->model === 'e5-small') {
+            // $this->search->setTable('library2025_embeddings2');
+            $query = "SELECT content_vector from library2025_embeddings2 where content_id=$paragraphId";
+        } else {
+            // $this->search->setTable('library2025_content_vectors');
+            $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
+        }
+        // $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
         try {
             $response = $this->client->sql($query);
             // var_dump($response['hits']['hits'] ); die();
@@ -292,7 +307,13 @@ class ParagraphRepository
         }
 
         $this->search->reset();
-        $this->search->setTable('library2025_content_vectors');
+
+        if ($form->model === 'e5-small') {
+            $this->search->setTable('library2025_embeddings2');
+        } else {
+            $this->search->setTable('library2025_content_vectors');
+        }
+
         $this->search->setSource(['library2025.*']);
         // var_dump($_id);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
