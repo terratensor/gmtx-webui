@@ -113,7 +113,6 @@ class LibraryController extends Controller
             $form->paragraphId = null;
         }
         // Обработка запроса по ID параграфа
-        // var_dump($form->paragraphId); die();
         if ($form->paragraphId && $form->matching === 'vector') {
             $form->query = ''; // Очищаем текстовый запрос
         }
@@ -121,12 +120,14 @@ class LibraryController extends Controller
             return $this->redirect('index');
         }
 
+        $similarity_model = Yii::$app->request->queryParams['model'] ?? null;
+        
         try {
             if ($form->load(Yii::$app->request->queryParams) && $form->validate()) {
                 if ($form->isEmpty()) {
                     return $this->redirect('index');
                 }
-                $results = $this->service->search($form);
+                $results = $this->service->search($form, $similarity_model);
             }
         } catch (\DomainException $e) {
             Yii::$app->errorHandler->logException($e);
@@ -142,6 +143,7 @@ class LibraryController extends Controller
             'aggs' => $aggs ?? [],
             'model' => $form,
             'errorQueryMessage' => $errorQueryMessage,
+            'similarity_model' => $similarity_model
         ]);
     }
 

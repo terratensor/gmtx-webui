@@ -230,17 +230,21 @@ class ParagraphRepository
     public function findByVector(SearchForm $form, array $vector): Search
     {
         $this->search->reset();
+        // var_dump($form->query);
         if ($form->model === 'e5-small') {
             $this->search->setTable('library2025_embeddings2');
         } else {
             $this->search->setTable('library2025_content_vectors');
         }
         $this->search->setSource(['library2025.*']);
-        $query = new KnnQuery('content_vector', $vector, 100, 1000);
+        // $query = new KnnQuery('content_vector', $vector, 100, 1000);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
-        $this->search->join($joinQuery, true)
-            // ->knn('content_vector', $vector, 200)
-            ->search($query)
+        $this->search
+            ->join($joinQuery, clearJoin: true)
+            // ->filter(new MatchQuery($form->query, 'library2025.content'))
+            ->knn('content_vector', $vector, 200)
+
+            // ->search($query)
         ;
 
 
@@ -275,15 +279,16 @@ class ParagraphRepository
         return $this->search;
     }
 
-    public function findBySimilarParagraphId(int $paragraphId, SearchForm $form): Search
+    public function findBySimilarParagraphId(int $paragraphId, SearchForm $form, ?string $similarity_model): Search
     {
+        // var_dump($similarity_model);
         $content_vector = [];
-        if ($form->model === 'e5-small') {
+        if ($similarity_model === 'e5-small') {
             // $this->search->setTable('library2025_embeddings2');
-            $query = "SELECT content_vector from library2025_embeddings2 where content_id=$paragraphId";
+            $query = "SELECT id, content_vector from library2025_embeddings2 where content_id=$paragraphId";
         } else {
             // $this->search->setTable('library2025_content_vectors');
-            $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
+            $query = "SELECT id, content_vector from library2025_content_vectors where content_id=$paragraphId";
         }
         // $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
         try {
@@ -308,7 +313,7 @@ class ParagraphRepository
 
         $this->search->reset();
 
-        if ($form->model === 'e5-small') {
+        if ($similarity_model === 'e5-small') {
             $this->search->setTable('library2025_embeddings2');
         } else {
             $this->search->setTable('library2025_content_vectors');
@@ -317,8 +322,11 @@ class ParagraphRepository
         $this->search->setSource(['library2025.*']);
         // var_dump($_id);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
-        $this->search->join($joinQuery, true)
-            ->knn('content_vector', $content_vector, 100);
+        $this->search
+            // ->match($form->query, 'contetn')
+            ->knn('content_vector', $content_vector, 200)
+            ->join($joinQuery, clearJoin: true)
+        ;
 
         // Применяем фильтры
         if ($form->genre !== '') {

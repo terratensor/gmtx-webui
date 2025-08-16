@@ -55,7 +55,8 @@ class SearchResultHelper
         $config = \HTMLPurifier_Config::createDefault();
 
         // 2. Настраиваем все параметры ДО финализации конфига
-        $config->set('HTML.Allowed', 'p,ol,ul,li,strong,em,a[href],br,mark');
+        // $config->set('HTML.Allowed', 'p,ol,ul,li,strong,em,a[href],br,mark');
+        $config->set('HTML.Allowed', 'p,ol,ul,lia[href],br,mark');
         $config->set('Cache.DefinitionImpl', null);
 
         $cachePath = Yii::getAlias('@runtime/htmlpurifier');
@@ -81,7 +82,8 @@ class SearchResultHelper
             return $purifier->purify($html);
         } catch (\Exception $e) {
             Yii::error('HTMLPurifier error: ' . $e->getMessage());
-            return strip_tags($html, '<p><ol><ul><li><mark><strong><em><a><br>');
+            // return strip_tags($html, '<p><ol><ul><li><mark><strong><em><a><br>');
+            return strip_tags($html, '<p><ol><ul><li><mark><a><br>');
         }
     }
 

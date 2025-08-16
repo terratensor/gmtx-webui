@@ -20,15 +20,15 @@ class SearchForm extends Model
     public bool $genreInlineView = false;
     // Включает нечёткий поиск 
     public bool $fuzzy = false;
-    public string $matching = 'query_string';   
-    
-    public string $model = 'glove';
+    public string $matching = 'query_string';
+
+    public string $model = 'e5-small';
 
     public function rules(): array
     {
         return [
             ['query', 'string'],
-             ['paragraphId', 'integer', 'min' => 1],
+            ['paragraphId', 'integer', 'min' => 1],
             ['genre', 'string'],
             ['author', 'string'],
             ['title', 'string'],

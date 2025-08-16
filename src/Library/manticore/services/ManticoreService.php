@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace src\Library\manticore\services;
 
-use App\Library\manticore\services\VectorizerService;
-use src\Library\manticore\models\Paragraph;
-use src\Library\manticore\repositories\AuthorRepository;
-use src\Library\manticore\repositories\TitleRepository;
 use Yii;
+use yii\caching\TagDependency;
+use yii\data\ArrayDataProvider;
 use src\Search\forms\SearchForm;
+use yii\data\DataProviderInterface;
+use src\Library\manticore\models\Paragraph;
+use App\Library\manticore\services\VectorizerService;
+use src\Library\manticore\repositories\TitleRepository;
+use src\Library\manticore\repositories\AuthorRepository;
 use src\Library\manticore\repositories\ParagraphRepository;
 use src\Library\manticore\repositories\ParagraphDataProvider;
-use yii\data\ArrayDataProvider;
-use yii\data\DataProviderInterface;
 
 class ManticoreService
 {
@@ -38,13 +39,14 @@ class ManticoreService
      * @param SearchForm $form
      * @return ParagraphDataProvider
      */
-    public function search(SearchForm $form): ParagraphDataProvider
+    public function search(SearchForm $form, ?string $similarity_model): ParagraphDataProvider
     {
         // Обработка поиска по похожим параграфам
         if ($form->paragraphId && $form->matching === 'vector') {
             $results = $this->paragraphRepository->findBySimilarParagraphId(
                 (int)$form->paragraphId,
-                $form
+                $form,
+                $similarity_model
             );
         }
         // Обычный поиск
@@ -94,12 +96,21 @@ class ManticoreService
 
     public function facets(): array
     {
-        $facets = [];
-        $facets['total_count'] = $this->paragraphRepository->getTotalCount(true);
-        $facets['genres'] = $this->paragraphRepository->findGenreFacets();
-        $facets['authors'] = $this->authorRepository->findFacetsByName('');
-        $facets['titles'] = $this->titleRepository->findFacetsByName('');
-        return $facets;
+        $cacheKey = __METHOD__ . '_' . md5('index');
+        $cacheDuration = 3600; // 1 час
+        return Yii::$app->cache->getOrSet(
+            $cacheKey,
+            function () {
+                $facets = [];
+                $facets['total_count'] = $this->paragraphRepository->getTotalCount(true);
+                $facets['genres'] = $this->paragraphRepository->findGenreFacets();
+                $facets['authors'] = $this->authorRepository->findFacetsByName('');
+                $facets['titles'] = $this->titleRepository->findFacetsByName('');
+                return $facets;
+            },
+            $cacheDuration,
+            new TagDependency(['tags' => 'index'])
+        );
     }
 
     // public function aggs(SearchForm $form)

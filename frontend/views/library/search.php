@@ -18,6 +18,7 @@ use src\Library\manticore\repositories\ParagraphDataProvider;
  * @var ParagraphDataProvider $results
  * @var Pagination $pages
  * @var SearchForm $model
+ * @var string $similarity_model
  * @var string $errorQueryMessage
  */
 
@@ -51,6 +52,7 @@ echo Html::endForm();
         <div class="d-flex justify-content-between align-items-center">
           <span>
             Показаны параграфы, похожие на <?= Html::a($model->paragraphId, ['library/paragraph', 'id' => $model->paragraphId], ['target' => '_blank']); ?>
+            <small>(модель <?= $similarity_model ?>)</small>
           </span>
           <!-- <?= Html::a('Вернуться к обычному поиску', ['library/search'], [
                   'class' => 'btn btn-sm btn-outline-primary'
@@ -146,7 +148,7 @@ echo Html::endForm();
                 <div class="card-body">
                   <div class="py-xl-5 py-3 px-xl-5 px-lg-5 px-md-5 px-sm-3 paragraph" data-entity-id="<?= $paragraph->id; ?>">
                     <?php SearchResultHelper::highlightFieldContent($paragraph, 'title'); ?>
-                    <div class=" paragraph-text">
+                    <div class="paragraph-text">
                       <?= SearchResultHelper::highlightFieldContent($paragraph, 'content', 'markdown', $model->singleLineMode); ?>
                     </div>
                   </div>
