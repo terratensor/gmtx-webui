@@ -39,14 +39,13 @@ class ManticoreService
      * @param SearchForm $form
      * @return ParagraphDataProvider
      */
-    public function search(SearchForm $form, ?string $similarity_model): ParagraphDataProvider
+    public function search(SearchForm $form): ParagraphDataProvider
     {
         // Обработка поиска по похожим параграфам
         if ($form->paragraphId && $form->matching === 'vector') {
             $results = $this->paragraphRepository->findBySimilarParagraphId(
                 (int)$form->paragraphId,
-                $form,
-                $similarity_model
+                $form
             );
         }
         // Обычный поиск
@@ -57,7 +56,7 @@ class ManticoreService
                 'match' => $this->paragraphRepository->findByQueryStringMatch($form),
                 'vector' => $this->paragraphRepository->findByVector(
                     $form,
-                    $this->vectorizer->vectorize($form->query, $form->model)
+                    $this->vectorizer->vectorize($form->query)
                 ),
                 'context' => $this->paragraphRepository->findByContext($form),
             };

@@ -231,11 +231,9 @@ class ParagraphRepository
     {
         $this->search->reset();
         // var_dump($form->query);
-        if ($form->model === 'e5-small') {
-            $this->search->setTable('library2025_embeddings2');
-        } else {
-            $this->search->setTable('library2025_content_vectors');
-        }
+        
+        $this->search->setTable('library2025_content_vectors');
+        
         $this->search->setSource(['library2025.*']);
         // $query = new KnnQuery('content_vector', $vector, 100, 1000);
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
@@ -279,17 +277,13 @@ class ParagraphRepository
         return $this->search;
     }
 
-    public function findBySimilarParagraphId(int $paragraphId, SearchForm $form, ?string $similarity_model): Search
+    public function findBySimilarParagraphId(int $paragraphId, SearchForm $form): Search
     {
         // var_dump($similarity_model);
         $content_vector = [];
-        if ($similarity_model === 'e5-small') {
-            // $this->search->setTable('library2025_embeddings2');
-            $query = "SELECT id, content_vector from library2025_embeddings2 where content_id=$paragraphId";
-        } else {
-            // $this->search->setTable('library2025_content_vectors');
-            $query = "SELECT id, content_vector from library2025_content_vectors where content_id=$paragraphId";
-        }
+        
+        $query = "SELECT id, content_vector from library2025_content_vectors where content_id=$paragraphId";
+        
         // $query = "SELECT content_vector from library2025_content_vectors where content_id=$paragraphId";
         try {
             $response = $this->client->sql($query);
@@ -313,14 +307,10 @@ class ParagraphRepository
 
         $this->search->reset();
 
-        if ($similarity_model === 'e5-small') {
-            $this->search->setTable('library2025_embeddings2');
-        } else {
-            $this->search->setTable('library2025_content_vectors');
-        }
+        $this->search->setTable('library2025_content_vectors');
 
         $this->search->setSource(['library2025.*']);
-        // var_dump($_id);
+
         $joinQuery = new JoinQuery('left', 'library2025', 'content_id', 'id');
         $this->search
             // ->match($form->query, 'contetn')
